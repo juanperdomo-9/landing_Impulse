@@ -12,6 +12,7 @@
         font-family: Arial, sans-serif;
         background: #111;
         color: white;
+        overflow-x: hidden;  
     }
 
     .container {
@@ -279,6 +280,60 @@
         font-size: 14px;
         color: #bbb;
     }
+
+@media (max-width: 768px) {
+
+    /* NAVBAR */
+    .nav-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nav-logo img {
+        height: 35px;
+    }
+
+    /* HERO */
+    .hero {
+        padding: 20px;
+    }
+
+    .hero-banner {
+        padding: 10px;
+    }
+
+    /* SOBRE NOSOTROS */
+    .sobre-container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .sobre-boxes {
+        width: 100%;
+    }
+
+    /* CARDS */
+    .cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 90%;
+    }
+
+    /* BOTONES */
+    .btn, .btn-info {
+        width: 100%;
+        text-align: center;
+    }
+
+}
 </style>
 
 </head>
