@@ -283,17 +283,25 @@
 
 @media (max-width: 768px) {
 
-    /* 🔥 NAVBAR (FORZADO HORIZONTAL) */
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        overflow-x: hidden;
+    }
+
+    /* 🔥 NAVBAR */
     .nav-container {
         display: flex;
-        flex-direction: row; /* 🔥 clave */
+        flex-direction: row;
         justify-content: space-between;
         align-items: center;
     }
 
     .nav-links {
         display: flex;
-        flex-direction: row; /* 🔥 clave */
+        flex-direction: row;
         justify-content: center;
         gap: 10px;
         flex-wrap: wrap;
@@ -315,24 +323,50 @@
     }
 
     .hero-banner {
+        width: 100%;
+        max-width: 100%;
         padding: 10px;
     }
 
-    /* 🔥 SOBRE NOSOTROS (FIX REAL) */
+    .hero-banner img {
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        display: block;
+    }
+
+    /* 🔥 SOBRE NOSOTROS (FIX DEFINITIVO) */
+    .sobre {
+        overflow: hidden;
+        position: relative;
+    }
+
     .sobre-container {
-        display: block; /* 🔥 simplificamos todo */
+        display: block;
         text-align: center;
+        position: relative;
+        z-index: 2; /* 🔥 clave */
+    }
+
+    .sobre-texto {
+        width: 100%;
     }
 
     .sobre-boxes {
-        display: block; /* 🔥 nada de flex */
+        display: block;
+        width: 100%;
         margin-top: 20px;
+        position: relative;
+        z-index: 2; /* 🔥 clave */
     }
 
     .box {
         width: 100%;
         margin-bottom: 15px;
         display: block;
+        background: #1c1c1c;
+        padding: 20px;
+        border-radius: 12px;
     }
 
     /* 🔥 CARDS */
@@ -344,18 +378,18 @@
 
     .card {
         width: 90%;
+        max-width: 100%;
     }
 
-    /* 🔥 BOTONES (ARREGLADO) */
+    /* 🔥 BOTONES */
     .btn, .btn-info {
-        width: auto;          /* 🔥 clave */
+        width: auto;
         display: inline-block;
         padding: 8px 12px;
         font-size: 13px;
     }
 
 }
-
 </style>
 
 </head>
