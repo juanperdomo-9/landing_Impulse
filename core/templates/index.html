@@ -320,22 +320,19 @@
 
     /* 🔥 SOBRE NOSOTROS (FIX REAL) */
     .sobre-container {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
+        display: block; /* 🔥 simplificamos todo */
         text-align: center;
     }
 
     .sobre-boxes {
-        display: flex !important;   /* 🔥 fuerza aparición */
-        flex-direction: column;
-        gap: 15px;
-        width: 100%;
+        display: block; /* 🔥 nada de flex */
+        margin-top: 20px;
     }
 
     .box {
         width: 100%;
-        display: block !important; /* 🔥 evita que desaparezcan */
+        margin-bottom: 15px;
+        display: block;
     }
 
     /* 🔥 CARDS */
