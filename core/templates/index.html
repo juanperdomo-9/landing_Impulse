@@ -290,12 +290,20 @@
     }
 
     .nav-links {
-        flex-direction: column;
-        gap: 10px;
+        flex-direction: row;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
     }
 
-    .nav-logo img {
-        height: 35px;
+    .nav-links a {
+        font-size: 14px;
+    }
+
+    .nav-btn {
+        width: auto;
+        padding: 8px 12px;
+        font-size: 13px;
     }
 
     /* HERO */
@@ -307,14 +315,28 @@
         padding: 10px;
     }
 
-    /* SOBRE NOSOTROS */
+    /* SOBRE NOSOTROS 🔥 (ARREGLADO) */
     .sobre-container {
         flex-direction: column;
         text-align: center;
+        gap: 30px;
+    }
+
+    .sobre-texto {
+        width: 100%;
     }
 
     .sobre-boxes {
+        display: flex;
+        flex-direction: column;
         width: 100%;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .box {
+        width: 90%;
+        display: block;
     }
 
     /* CARDS */
