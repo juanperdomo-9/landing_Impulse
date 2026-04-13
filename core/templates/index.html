@@ -283,27 +283,30 @@
 
 @media (max-width: 768px) {
 
-    /* NAVBAR */
+    /* 🔥 NAVBAR (FORZADO HORIZONTAL) */
     .nav-container {
-        flex-direction: column;
-        gap: 10px;
+        display: flex;
+        flex-direction: row; /* 🔥 clave */
+        justify-content: space-between;
+        align-items: center;
     }
 
     .nav-links {
-        flex-direction: row;
+        display: flex;
+        flex-direction: row; /* 🔥 clave */
         justify-content: center;
-        gap: 15px;
+        gap: 10px;
         flex-wrap: wrap;
     }
 
     .nav-links a {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .nav-btn {
         width: auto;
-        padding: 8px 12px;
-        font-size: 13px;
+        padding: 6px 10px;
+        font-size: 12px;
     }
 
     /* HERO */
@@ -315,32 +318,29 @@
         padding: 10px;
     }
 
-    /* SOBRE NOSOTROS 🔥 (ARREGLADO) */
+    /* 🔥 SOBRE NOSOTROS (FIX REAL) */
     .sobre-container {
+        display: flex;
         flex-direction: column;
-        text-align: center;
         gap: 30px;
-    }
-
-    .sobre-texto {
-        width: 100%;
+        text-align: center;
     }
 
     .sobre-boxes {
-        display: flex;
+        display: flex !important;   /* 🔥 fuerza aparición */
         flex-direction: column;
-        width: 100%;
         gap: 15px;
-        align-items: center;
+        width: 100%;
     }
 
     .box {
-        width: 90%;
-        display: block;
+        width: 100%;
+        display: block !important; /* 🔥 evita que desaparezcan */
     }
 
-    /* CARDS */
+    /* 🔥 CARDS */
     .cards {
+        display: flex;
         flex-direction: column;
         align-items: center;
     }
@@ -349,13 +349,16 @@
         width: 90%;
     }
 
-    /* BOTONES */
+    /* 🔥 BOTONES (ARREGLADO) */
     .btn, .btn-info {
-        width: 100%;
-        text-align: center;
+        width: auto;          /* 🔥 clave */
+        display: inline-block;
+        padding: 8px 12px;
+        font-size: 13px;
     }
 
 }
+
 </style>
 
 </head>
