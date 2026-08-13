@@ -3,244 +3,391 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Mi Landing</title>
+    <title>Impulsa Studio | Marketing Digital</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Impulsa Studio: agencia de marketing digital especializada en páginas web, gestión de redes, creación de contenido y publicidad en Meta y Google Ads.">
+    <meta name="theme-color" content="#1E2A5A">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231E2A5A'/%3E%3Crect x='14' y='34' width='8' height='16' rx='2' fill='%23FF6A00'/%3E%3Crect x='27' y='26' width='8' height='24' rx='2' fill='%23FF8C42'/%3E%3Crect x='40' y='16' width='8' height='34' rx='2' fill='%23FFC145'/%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
+    :root {
+        --navy: #1E2A5A;
+        --navy-deep: #141d40;
+        --navy-card: #10193c;
+        --orange: #FF6A00;
+        --orange-light: #FF8C42;
+        --green: #25D366;
+        --text-muted: #b9c2de;
+        --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
     body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        background: #1E2A5A;
+        font-family: 'Inter', Arial, sans-serif;
+        background: var(--navy);
         color: white;
-        overflow-x: hidden;  
+        overflow-x: hidden;
     }
+
+    h1, h2, h3 { font-family: 'Poppins', 'Inter', sans-serif; }
+
+    a { font-family: inherit; }
+
+    img { max-width: 100%; }
 
     .container {
         padding: 60px 20px;
         text-align: center;
     }
 
-    h1 {
-        font-size: 42px;
-    }
-
     p {
-        color: #ccc;
-        max-width: 600px;
-        margin: auto;
+        color: var(--text-muted);
+        line-height: 1.7;
     }
 
+    /* ---------- BOTONES ---------- */
     .btn {
-        display: inline-block;
-        margin-top: 20px;
-        padding: 15px 25px;
-        background: #25D366;
-        color: white;
-        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 26px;
         border-radius: 10px;
-        font-weight: bold;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        font-size: 15px;
     }
 
-    .section {
-        padding: 60px 20px;
+    .btn-primary {
+        background: var(--green);
+        color: white;
+        box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
     }
 
-    .cards {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20px;
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(37, 211, 102, 0.45);
     }
 
-    .card {
+    .btn-outline {
+        background: transparent;
+        border: 1.5px solid rgba(255, 255, 255, 0.35);
+        color: white;
+    }
+
+    .btn-outline:hover {
+        border-color: var(--orange);
+        background: rgba(255, 106, 0, 0.1);
+        transform: translateY(-3px);
+    }
+
+    .btn-info {
+        display: inline-block;
+        margin-top: 15px;
+        margin-right: 8px;
+        background: transparent;
+        border: 1px solid var(--orange);
+        color: var(--orange);
+        padding: 9px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .btn-info:hover {
+        background: var(--orange);
+        color: white;
+    }
+
+    /* ---------- SCROLL REVEAL ---------- */
+    .reveal {
         opacity: 0;
         transform: translateY(30px);
-        transition: all 0.6s ease;
-        background: #0f1a3a;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 20px;
-        border-radius: 15px;
+        transition: opacity 0.7s ease, transform 0.7s ease;
     }
 
-    .card.show {
+    .reveal.show {
         opacity: 1;
         transform: translateY(0);
     }
 
-    .cards {
-        position: relative;
-        z-index: 1;
-    }
-
-    img {
+    /* ---------- NAVBAR ---------- */
+    .navbar {
         width: 100%;
-        border-radius: 10px;
+        position: sticky;
+        top: 0;
+        background: rgba(20, 29, 64, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 1000;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    footer {
-        padding: 20px;
-        text-align: center;
-        color: #777;
-    }
-
-    .hero {
-        width: 100%;
-        padding: 30px 0 10px 0;
-        background: #1E2A5A;
+    .nav-container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 12px 20px;
         display: flex;
-        justify-content: center;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-logo {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 8px;
+        padding: 5px 10px;
+        line-height: 0;
+    }
+
+    .nav-logo img {
+        height: 30px;
+        width: auto;
+        max-width: 140px;
+        object-fit: contain;
+        display: block;
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .nav-links a {
+        color: #dfe4f5;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 500;
+        transition: 0.3s;
+        position: relative;
+    }
+
+    .nav-links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -4px;
+        width: 0;
+        height: 2px;
+        background: var(--orange);
+        transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover {
+        color: white;
+    }
+
+    .nav-links a:hover::after {
+        width: 100%;
+    }
+
+    .nav-toggle {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+    }
+
+    .nav-toggle span {
+        width: 24px;
+        height: 2px;
+        background: white;
+        border-radius: 2px;
+        transition: 0.3s;
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+        position: relative;
+        width: 100%;
+        padding: 90px 20px 70px;
+        background:
+            radial-gradient(circle at 15% 20%, rgba(255, 106, 0, 0.18), transparent 45%),
+            radial-gradient(circle at 85% 80%, rgba(37, 211, 102, 0.12), transparent 45%),
+            linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+        overflow: hidden;
+    }
+
+    .hero-inner {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        gap: 50px;
+        flex-wrap: wrap;
+    }
+
+    .hero-content {
+        flex: 1 1 420px;
+        text-align: left;
+    }
+
+    .eyebrow {
+        display: inline-block;
+        background: rgba(255, 106, 0, 0.12);
+        border: 1px solid rgba(255, 106, 0, 0.4);
+        color: var(--orange-light);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+
+    .hero-content h1 {
+        font-size: 44px;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0 0 18px;
+    }
+
+    .hero-content h1 span {
+        background: linear-gradient(90deg, var(--orange) 0%, var(--orange-light) 60%, #ffc145 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .hero-sub {
+        font-size: 17px;
+        max-width: 520px;
+        margin: 0 0 30px;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 34px;
+    }
+
+    .hero-tags {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .hero-tags span {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #d7dcf2;
+        font-size: 13px;
+        padding: 7px 14px;
+        border-radius: 999px;
     }
 
     .hero-banner {
-        width: 100%;
-        max-width: 1000px;
-        background: #fff; /* importante para tu logo */
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 0;
+        flex: 1 1 380px;
+        max-width: 480px;
+        background: #fff;
+        border-radius: var(--radius);
+        padding: 22px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+        position: relative;
+        z-index: 2;
     }
 
     .hero-banner img {
         width: 100%;
         height: auto;
         display: block;
-        box-shadow: 0 10px 30px rgba(30, 42, 90, 0.6);
-    }
-    .logo {
-        height: 80px; /* controla tamaño del logo */
+        border-radius: 10px;
     }
 
-   .navbar {
-    width: 100%;
-    position: sticky;
-    top: 0;
-    background: rgba(30, 42, 90, 0.9);
-    backdrop-filter: blur(10px);
-    z-index: 1000;
-    border-bottom: none;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.nav-logo img {
-    height: 40px;
-}
-
-.nav-links {
-    display: flex;
-    gap: 30px;
-}
-
-.nav-links a {
-    color: #ccc;
-    text-decoration: none;
-    font-size: 15px;
-    transition: 0.3s;
-}
-
-.nav-links a:hover {
-    color: white;
-}
-
-.nav-btn {
-    background: #FF6A00;
-    color: white;
-    padding: 10px 18px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 14px;
-    transition: 0.3s;
-}
-
-.nav-btn:hover {
-    background: #e65c00;
-}
-
-    .servicios-bg {
-        position: relative;
-        overflow: hidden;
-    }
-
-    /* burbujas base */
-    .bg-circle {
+    .hero-blob {
         position: absolute;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(255, 106, 0, 0.5), transparent 70%);
-        z-index: 0;
-        animation: float 8s ease-in-out infinite;
-    }
-
-    /* 4 esquinas */
-    .circle-1 { top: -100px; left: -100px; }
-    .circle-2 { top: -100px; right: -100px; }
-    .circle-3 { bottom: -100px; left: -100px; }
-    .circle-4 { bottom: -100px; right: -100px; }
-
-    /* asegurar contenido arriba */
-    .cards, h2 {
-        position: relative;
+        border-radius: 50%;
+        filter: blur(10px);
         z-index: 1;
+        animation: float 9s ease-in-out infinite;
     }
 
-    /* animación suave */
+    .blob-1 {
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(255, 106, 0, 0.35), transparent 70%);
+        top: -60px;
+        right: 10%;
+    }
+
+    .blob-2 {
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(37, 211, 102, 0.25), transparent 70%);
+        bottom: -60px;
+        left: 5%;
+        animation-delay: 2s;
+    }
+
     @keyframes float {
         0% { transform: translateY(0px); }
-        50% { transform: translateY(20px); }
+        50% { transform: translateY(22px); }
         100% { transform: translateY(0px); }
     }
-    .btn-info {
-        display: inline-block;
-        margin-top: 15px;
-        background: transparent;
-        border: 1px solid #FF6A00;
-        color: #FF6A00;
-        padding: 8px 14px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 14px;
-        transition: 0.3s;
-    }
 
-    .btn-info:hover {
-        background: #FF6A00;
-        color: white;
-    }
-
+    /* ---------- SOBRE NOSOTROS ---------- */
     .sobre {
-        padding: 40px 20px 60px 20px;
-        background: #1E2A5A;
+        padding: 90px 20px;
+        background: var(--navy);
+    }
+
+    .section-head {
+        text-align: center;
+        max-width: 640px;
+        margin: 0 auto 50px;
+    }
+
+    .section-head .eyebrow {
+        margin-bottom: 14px;
+    }
+
+    .section-head h2 {
+        font-size: 34px;
+        margin: 0 0 12px;
     }
 
     .sobre-container {
         max-width: 1200px;
         margin: auto;
         display: flex;
-        gap: 50px;
+        gap: 60px;
         flex-wrap: wrap;
         align-items: center;
     }
 
-    /* TEXTO */
     .sobre-texto {
-        flex: 1;
+        flex: 1 1 380px;
+        text-align: left;
     }
 
     .sobre-texto h2 {
-        font-size: 32px;
+        font-size: 30px;
         margin-bottom: 20px;
     }
 
     .sobre-texto p {
         margin-bottom: 15px;
-        color: #ccc;
     }
 
     .intro {
@@ -248,186 +395,395 @@
         color: white;
     }
 
-    /* BOXES */
     .sobre-boxes {
-        flex: 1;
+        flex: 1 1 340px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 18px;
     }
 
     .box {
-        background: #0f1a3a;
-        padding: 20px;
-        border-radius: 12px;
-        border-left: 4px solid #ff6a00;
-        transition: 0.3s;
-        opacity: 0;
-        transform: translateY(20px);
-        transition: 0.6s;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        background: var(--navy-card);
+        padding: 22px;
+        border-radius: 14px;
+        border-left: 4px solid var(--orange);
+        transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
     }
 
     .box:hover {
-        transform: translateX(5px);
-        background: #0f1a3a;
-        opacity: 1;
-        transform: translateY(0);
+        transform: translateX(6px);
+        background: #142049;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .box-icon {
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: rgba(255, 106, 0, 0.14);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .box-icon svg {
+        width: 22px;
+        height: 22px;
+        stroke: var(--orange-light);
     }
 
     .box h3 {
-        margin-bottom: 5px;
+        margin: 0 0 5px;
+        font-size: 17px;
     }
 
     .box p {
         font-size: 14px;
-        color: #bbb;
+        color: #a9b2cf;
+        margin: 0;
     }
 
-@media (max-width: 768px) {
-
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        overflow-x: hidden;
-    }
-
-    /* 🔥 NAVBAR */
-    .nav-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .nav-links {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .nav-links a {
-        font-size: 13px;
-    }
-
-    .nav-btn {
-        width: auto;
-        padding: 6px 10px;
-        font-size: 12px;
-    }
-
-    /* HERO */
-    .hero {
-        padding: 20px;
-    }
-
-    .hero-banner {
-        width: 100%;
-        max-width: 100%;
-        padding: 10px;
-    }
-
-    .hero-banner img {
-        width: 100%;
-        height: auto;
-        max-width: 100%;
-        display: block;
-        box-shadow: 0 10px 30px rgba(30, 42, 90, 0.6);
-    }
-
-    /* 🔥 SOBRE NOSOTROS (FIX DEFINITIVO) */
-    .sobre {
+    /* ---------- SERVICIOS ---------- */
+    .servicios-bg {
+        position: relative;
         overflow: hidden;
-        position: relative;
+        padding: 90px 20px 100px;
+        background: var(--navy-deep);
     }
 
-    .sobre-container {
-        display: block;
-        text-align: center;
-        position: relative;
-        z-index: 2; /* 🔥 clave */
+    .bg-circle {
+        position: absolute;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255, 106, 0, 0.4), transparent 70%);
+        z-index: 0;
+        animation: float 8s ease-in-out infinite;
     }
 
-    .sobre-texto {
-        width: 100%;
-    }
+    .circle-1 { top: -120px; left: -120px; }
+    .circle-2 { top: -120px; right: -120px; animation-delay: 1.5s; }
+    .circle-3 { bottom: -120px; left: -120px; animation-delay: 3s; }
+    .circle-4 { bottom: -120px; right: -120px; animation-delay: 4.5s; }
 
-    .sobre-boxes {
-        display: block;
-        width: 100%;
-        margin-top: 20px;
-        position: relative;
-        z-index: 2; /* 🔥 clave */
-    }
-
-    .box {
-        width: 100%;
-        margin-bottom: 15px;
-        display: block;
-        background: #0f1a3a;
-        padding: 20px;
-        border-radius: 12px;
-        opacity: 1 !important;
-        transform: none !important;
-    }
-
-    /* 🔥 CARDS */
     .cards {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 26px;
     }
 
     .card {
-        width: 90%;
-        max-width: 100%;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        background: var(--navy-card);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-top: 3px solid var(--orange);
+        padding: 30px 26px;
+        border-radius: var(--radius);
+        text-align: left;
+        display: flex;
+        flex-direction: column;
     }
 
-    .card a {
-        margin-right: 8px;
+    .card.show {
+        opacity: 1;
+        transform: translateY(0);
     }
-}
+
+    .card:hover {
+        border-color: rgba(255, 106, 0, 0.5);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        transform: translateY(-6px);
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: rgba(255, 106, 0, 0.14);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+    }
+
+    .card-icon svg {
+        width: 24px;
+        height: 24px;
+        stroke: var(--orange-light);
+    }
+
+    .card h3 {
+        margin: 0 0 12px;
+        font-size: 19px;
+    }
+
+    .card p {
+        font-size: 14.5px;
+        flex-grow: 1;
+    }
+
+    .card-actions {
+        margin-top: 10px;
+    }
+
+    /* ---------- CTA ---------- */
+    .cta {
+        padding: 80px 20px;
+        text-align: center;
+        background: linear-gradient(135deg, var(--navy) 0%, #23306b 100%);
+    }
+
+    .cta h2 {
+        font-size: 30px;
+        margin: 0 0 14px;
+    }
+
+    .cta p {
+        max-width: 520px;
+        margin: 0 auto 30px;
+    }
+
+    /* ---------- FOOTER ---------- */
+    footer {
+        background: var(--navy-deep);
+        padding: 50px 20px 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .footer-inner {
+        max-width: 1200px;
+        margin: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        text-align: left;
+    }
+
+    .footer-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 17px;
+    }
+
+    .footer-brand img {
+        height: 26px;
+        border-radius: 4px;
+    }
+
+    .footer-links {
+        display: flex;
+        gap: 24px;
+    }
+
+    .footer-links a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+
+    .footer-links a:hover {
+        color: white;
+    }
+
+    .footer-bottom {
+        max-width: 1200px;
+        margin: 24px auto 0;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        text-align: center;
+        color: #77809e;
+        font-size: 13px;
+    }
+
+    /* ---------- WHATSAPP FLOAT ---------- */
+    .whatsapp-float {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 58px;
+        height: 58px;
+        background: var(--green);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 26px rgba(37, 211, 102, 0.5);
+        z-index: 999;
+        transition: transform 0.25s ease;
+    }
+
+    .whatsapp-float:hover {
+        transform: scale(1.08);
+    }
+
+    .whatsapp-float svg {
+        width: 28px;
+        height: 28px;
+        fill: white;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 900px) {
+        .hero-inner { flex-direction: column-reverse; }
+        .hero-content,
+        .hero-banner {
+            flex: none;
+            width: 100%;
+        }
+        .hero-content { text-align: center; }
+        .hero-sub { margin-left: auto; margin-right: auto; }
+        .hero-actions { justify-content: center; }
+        .hero-tags { justify-content: center; }
+        .hero-banner { margin: 0 auto; }
+        .sobre-container { flex-direction: column; }
+        .sobre-texto { text-align: center; }
+        .sobre-texto p { text-align: left; }
+    }
+
+    @media (max-width: 768px) {
+
+        .nav-toggle {
+            display: flex;
+        }
+
+        .nav-links {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 22, 51, 0.98);
+            backdrop-filter: blur(12px);
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+        }
+
+        .nav-links.open {
+            max-height: 260px;
+            padding: 14px 20px 20px;
+        }
+
+        .nav-links a {
+            width: 100%;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .hero-content h1 { font-size: 32px; }
+
+        .hero-banner { padding: 16px; }
+
+        .section-head h2 { font-size: 27px; }
+
+        .footer-inner {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .footer-links {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .whatsapp-float {
+            width: 52px;
+            height: 52px;
+            bottom: 18px;
+            right: 18px;
+        }
+    }
 </style>
 
 </head>
+<body>
+
 <nav class="navbar">
     <div class="nav-container">
 
         <!-- Logo -->
-        <div class="nav-logo">
-            <img src="{% static 'img/horizontal.jpeg' %}" alt="logo">
-        </div>
+        <a href="#top" class="nav-logo">
+            <img src="{% static 'img/horizontal.jpeg' %}" alt="Impulsa Studio">
+        </a>
 
         <!-- Links -->
-        <div class="nav-links">
-            <a href="#">Inicio</a>
+        <div class="nav-links" id="navLinks">
+            <a href="#top">Inicio</a>
+            <a href="#sobre">Nosotros</a>
             <a href="#servicios">Servicios</a>
+            <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener">
+                Contactar
+            </a>
         </div>
 
-        <!-- Botón CTA -->
-        <a href="https://wa.me/5492216826109" class="nav-btn" target="_blank">
-            Contactar
-        </a>
+        <!-- Botón hamburguesa (mobile) -->
+        <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
 
     </div>
 </nav>
-<body>
-<!-- HERO -->
-<section class="hero">
-    <div class="hero-banner">
-        <img src="{% static 'img/horizontal.jpeg' %}" alt="Impulsa Studio">
-    </div>
-</section>
 
-<section class="sobre">
-    
+<!-- HERO -->
+<header class="hero" id="top">
+    <div class="hero-blob blob-1"></div>
+    <div class="hero-blob blob-2"></div>
+
+    <div class="hero-inner">
+        <div class="hero-content reveal">
+            <span class="eyebrow">Marketing Digital</span>
+            <h1>Hacemos crecer <span>tu marca</span> en el mundo digital</h1>
+            <p class="hero-sub">
+                Estrategia, contenido, publicidad y desarrollo web en un mismo lugar,
+                para que tu presencia online trabaje para vos y se convierta en más clientes.
+            </p>
+            <div class="hero-actions">
+                <a href="https://wa.me/{{ whatsapp_number }}" class="btn btn-primary" target="_blank" rel="noopener">
+                    Hablemos por WhatsApp
+                </a>
+                <a href="#servicios" class="btn btn-outline">
+                    Ver servicios
+                </a>
+            </div>
+            <div class="hero-tags">
+                <span>Diseño Web</span>
+                <span>Redes Sociales</span>
+                <span>Meta &amp; Google Ads</span>
+                <span>Contenido</span>
+            </div>
+        </div>
+
+        <div class="hero-banner reveal">
+            <img src="{% static 'img/horizontal.jpeg' %}" alt="Impulsa Studio - Marketing Digital">
+        </div>
+    </div>
+</header>
+
+<!-- SOBRE NOSOTROS -->
+<section class="sobre" id="sobre">
+
     <div class="sobre-container">
 
         <!-- TEXTO -->
-        <div class="sobre-texto">
+        <div class="sobre-texto reveal">
             <h2>Sobre nosotros</h2>
 
             <p class="intro">
@@ -448,21 +804,36 @@
         </div>
 
         <!-- BLOQUES -->
-        <div class="sobre-boxes">
+        <div class="sobre-boxes reveal">
 
             <div class="box">
-                <h3>Estrategia</h3>
-                <p>Analizamos y planificamos cada paso para que tu marca crezca con sentido.</p>
+                <div class="box-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>
+                </div>
+                <div>
+                    <h3>Estrategia</h3>
+                    <p>Analizamos y planificamos cada paso para que tu marca crezca con sentido.</p>
+                </div>
             </div>
 
             <div class="box">
-                <h3>Contenido</h3>
-                <p>Diseñamos piezas que conectan con tu público y transmiten valor real.</p>
+                <div class="box-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1 10-10a2 2 0 0 0-3-3L5 16l-1 4z"/></svg>
+                </div>
+                <div>
+                    <h3>Contenido</h3>
+                    <p>Diseñamos piezas que conectan con tu público y transmiten valor real.</p>
+                </div>
             </div>
 
             <div class="box">
-                <h3>Resultados</h3>
-                <p>Buscamos que tu presencia digital genere confianza y ventas.</p>
+                <div class="box-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V10M12 19V5M20 19v-7"/></svg>
+                </div>
+                <div>
+                    <h3>Resultados</h3>
+                    <p>Buscamos que tu presencia digital genere confianza y ventas.</p>
+                </div>
             </div>
 
         </div>
@@ -477,11 +848,19 @@
 <div class="bg-circle circle-2"></div>
 <div class="bg-circle circle-3"></div>
 <div class="bg-circle circle-4"></div>
-    <h2>Servicios</h2>
+
+    <div class="section-head reveal">
+        <span class="eyebrow">Lo que hacemos</span>
+        <h2>Servicios</h2>
+        <p>Todo lo que tu marca necesita para tener una presencia digital sólida y efectiva.</p>
+    </div>
 
     <div class="cards">
 
         <div class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+            </div>
             <h3>Páginas web</h3>
             <p>
                 Creamos páginas web pensadas para mostrar tu marca de forma profesional, generar confianza y convertir visitas en clientes.
@@ -489,70 +868,132 @@
                 Ya sea una web de servicios, tienda online o landing page, buscamos que tu presencia online trabaje para vos las 24 horas.
                 Cada proyecto se desarrolla de forma personalizada, cuidando la estética, la funcionalidad y la experiencia del usuario.
             </p>
-            <a href="https://wa.me/5492216826109?text=Hola,%20quiero%20más%20info%20sobre%20páginas%20web" class="btn-info" target="_blank">
-                Más info
-            </a>
-            <a href="https://jpweb.com.ar" class="btn-info" target="_blank">
-                Ver trabajos
-            </a>
+            <div class="card-actions">
+                <a href="https://wa.me/{{ whatsapp_number }}?text=Hola,%20quiero%20más%20info%20sobre%20páginas%20web" class="btn-info" target="_blank" rel="noopener">
+                    Más info
+                </a>
+                <a href="https://jpweb.com.ar" class="btn-info" target="_blank" rel="noopener">
+                    Ver trabajos
+                </a>
+            </div>
         </div>
 
         <div class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.8"/><path d="M21 15l-5-5-9 9"/></svg>
+            </div>
             <h3>Creación de contenido</h3>
             <p>
                 Creamos contenido pensado para captar la atención, generar conexión y transmitir el valor de tu marca.
                 Trabajamos a partir del material que nos brindás o te guiamos para producirlo, transformándolo en piezas visuales y mensajes claros que comuniquen de forma efectiva.
                 Nuestro objetivo es que tu contenido no solo se vea bien, sino que tenga una intención estratégica detrás.
             </p>
-            <a href="https://wa.me/5492216826109?text=Hola,%20quiero%20más%20info%20sobre%20creación%20de%20contenido" class="btn-info" target="_blank">
-                Más info
-            </a>
+            <div class="card-actions">
+                <a href="https://wa.me/{{ whatsapp_number }}?text=Hola,%20quiero%20más%20info%20sobre%20creación%20de%20contenido" class="btn-info" target="_blank" rel="noopener">
+                    Más info
+                </a>
+            </div>
         </div>
 
         <div class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7-7 18-2-8-8-3z"/></svg>
+            </div>
             <h3>Publicidad en Meta y Google Ads</h3>
             <p>
                 Diseñamos y gestionamos campañas publicitarias orientadas a atraer clientes reales y generar oportunidades de venta.
                 Trabajamos con segmentación estratégica, análisis de datos y optimización constante para que cada inversión tenga el mejor rendimiento posible.
                 Ya sea para aumentar el alcance, generar consultas o impulsar ventas, adaptamos cada campaña a los objetivos de tu negocio.
             </p>
-            <a href="https://wa.me/5492216826109?text=Hola,%20quiero%20más%20info%20sobre%20publicidad%20en%20Meta%20y%20Google%20Ads" class="btn-info" target="_blank">
-                Más info
-            </a>
+            <div class="card-actions">
+                <a href="https://wa.me/{{ whatsapp_number }}?text=Hola,%20quiero%20más%20info%20sobre%20publicidad%20en%20Meta%20y%20Google%20Ads" class="btn-info" target="_blank" rel="noopener">
+                    Más info
+                </a>
+            </div>
         </div>
 
         <div class="card">
+            <div class="card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a13 13 0 0 1 0 18M12 3a13 13 0 0 0 0 18M3 12h18"/></svg>
+            </div>
             <h3>Manejo de redes</h3>
             <p>
                 Nos encargamos de gestionar tus redes sociales de manera estratégica para que dejen de ser solo un canal de publicación y se conviertan en una herramienta real de crecimiento.
                 Planificamos, organizamos y ejecutamos el contenido, manteniendo una comunicación coherente con tu marca y enfocada en conectar con tu público.
                 Además, analizamos resultados y optimizamos constantemente para mejorar el alcance, la interacción y las oportunidades de venta.
             </p>
-            <a href="https://wa.me/5492216826109?text=Hola,%20quiero%20más%20info%20sobre%20manejo%20de%20redes" class="btn-info" target="_blank">
-                Más info
-            </a>
+            <div class="card-actions">
+                <a href="https://wa.me/{{ whatsapp_number }}?text=Hola,%20quiero%20más%20info%20sobre%20manejo%20de%20redes" class="btn-info" target="_blank" rel="noopener">
+                    Más info
+                </a>
+            </div>
         </div>
 
     </div>
 </section>
 
+<!-- CTA -->
+<section class="cta reveal">
+    <h2>¿Listo para impulsar tu marca?</h2>
+    <p>Contanos qué necesitás y armamos juntos la mejor estrategia digital para tu negocio.</p>
+    <a href="https://wa.me/{{ whatsapp_number }}?text=Hola,%20quiero%20impulsar%20mi%20marca" class="btn btn-primary" target="_blank" rel="noopener">
+        Escribinos ahora
+    </a>
+</section>
+
 <footer>
-    © 2026 - Impulsa Studio
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <img src="{% static 'img/horizontal.jpeg' %}" alt="Impulsa Studio">
+        </div>
+        <div class="footer-links">
+            <a href="#top">Inicio</a>
+            <a href="#sobre">Nosotros</a>
+            <a href="#servicios">Servicios</a>
+            <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        © {% now "Y" %} Impulsa Studio — Marketing Digital
+    </div>
 </footer>
+
+<!-- WHATSAPP FLOTANTE -->
+<a class="whatsapp-float" href="https://wa.me/{{ whatsapp_number }}" target="_blank" rel="noopener" aria-label="Escribinos por WhatsApp">
+    <svg viewBox="0 0 32 32"><path d="M16.001 3C9.376 3 4 8.373 4 15c0 2.494.75 4.812 2.037 6.744L4 29l7.44-1.955A11.93 11.93 0 0 0 16.001 27C22.626 27 28 21.627 28 15S22.626 3 16.001 3zm6.949 17.104c-.29.816-1.44 1.5-2.35 1.694-.626.132-1.443.238-4.194-.9-3.523-1.46-5.79-5.033-5.966-5.267-.169-.234-1.428-1.9-1.428-3.625 0-1.725.9-2.572 1.222-2.924.29-.317.633-.397.844-.397.211 0 .422.002.606.011.194.01.454-.074.71.542.29.694.986 2.394 1.072 2.569.087.175.145.379.029.613-.116.234-.174.379-.343.585-.169.205-.354.457-.506.613-.169.175-.345.365-.148.716.198.35.879 1.451 1.887 2.35 1.297 1.155 2.39 1.512 2.741 1.681.35.169.554.14.759-.084.204-.223.876-1.022 1.11-1.372.234-.35.468-.29.789-.175.32.116 2.033.958 2.383 1.133.35.175.583.263.671.409.087.146.087.847-.203 1.663z"/></svg>
+</a>
+
 <script>
-    const cards = document.querySelectorAll('.card');
+    // --- Menú mobile ---
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen);
+        navToggle.classList.toggle('open');
+    });
+
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('open');
+            navToggle.setAttribute('aria-expanded', false);
+        });
+    });
+
+    // --- Animaciones al hacer scroll ---
+    const animated = document.querySelectorAll('.card, .reveal');
 
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('show');
+                observer.unobserve(entry.target);
             }
         });
-    });
+    }, { threshold: 0.15 });
 
-    cards.forEach(card => {
-        observer.observe(card);
-    });
+    animated.forEach(el => observer.observe(el));
 </script>
 </body>
 </html>

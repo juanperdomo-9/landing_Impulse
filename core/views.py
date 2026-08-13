@@ -1,4 +1,7 @@
 from django.shortcuts import render
 
 def home(request):
-    return render(request, 'index.html')
+    context = {
+        'whatsapp_number': '5492216826109',
+    }
+    return render(request, 'index.html', context)
