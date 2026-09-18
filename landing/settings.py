@@ -26,6 +26,7 @@ INSTALLED_APPS = [
 # ⚡ MIDDLEWARE (WhiteNoise agregado)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'landing.frame_embed.AllowFrameEmbedMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # 🔥 CLAVE
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
