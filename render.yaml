@@ -11,7 +11,9 @@ services:
   - type: web
     name: impulsa-editor
     runtime: node
-    plan: starter # siempre encendido; el plan free se "duerme" y tarda ~1 minuto en volver
+    # gratis: se "duerme" tras 15 min sin visitas y la primera vuelve en ~1 minuto.
+    # Para que esté siempre encendido, cambiar a "starter" (unos 7 dólares al mes).
+    plan: free
     region: virginia
     rootDir: editor
     buildCommand: npm ci && npm run build
