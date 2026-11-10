@@ -71,7 +71,7 @@ export default function PublishPanel() {
       </p>
       {!brand?.name && (
         <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-2 text-[11px] text-amber-200">
-          Consejo: completa tu <b>Kit de marca</b> (pestaña 🎨 Marca) para que el texto use tu tono, tus datos de contacto y
+          Consejo: completa tu <b>Kit de marca</b> (pestaña Marca) para que el texto use tu tono, tus datos de contacto y
           tus hashtags.
         </p>
       )}
@@ -105,14 +105,14 @@ export default function PublishPanel() {
         </label>
       )}
       <button className="btn btn-primary w-full justify-center" disabled={busy} onClick={generate}>
-        {busy ? "Escribiendo…" : text ? "✍️ Generar otra versión" : "✍️ Escribir texto para publicar"}
+        {busy ? "Escribiendo…" : text ? "Generar otra versión" : "Escribir texto para publicar"}
       </button>
       {error && <p className="text-xs text-red-400">{error}</p>}
       {text && (
         <div className="space-y-2">
           <textarea id="copy-result" className="input" rows={12} value={text} onChange={(e) => setText(e.target.value)} />
           <button className="btn w-full justify-center" onClick={copy}>
-            {copied ? "✓ Copiado" : "📋 Copiar texto"}
+            {copied ? "✓ Copiado" : "Copiar texto"}
           </button>
         </div>
       )}

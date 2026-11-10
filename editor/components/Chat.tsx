@@ -7,6 +7,7 @@ import { executeTool } from "@/lib/aiExecutor";
 import { imageThumb } from "@/lib/media";
 import { getPlayer } from "@/lib/player";
 import { store, useEditor } from "@/lib/store";
+import { IconBrandBars } from "./Icons";
 
 type Msg = Anthropic.Beta.BetaMessageParam;
 type Block = Anthropic.Beta.BetaContentBlock;
@@ -210,7 +211,9 @@ export default function Chat({ usage: initialUsage }: { usage?: { used: number; 
   return (
     <aside className="flex w-[360px] shrink-0 flex-col border-l border-[var(--line)] bg-[var(--panel)]">
       <div className="flex h-11 shrink-0 items-center gap-2 border-b border-[var(--line)] px-4">
-        <span className="grad grid h-6 w-6 place-items-center rounded-md text-xs text-white">✨</span>
+        <span className="brand-mark h-7 w-7">
+          <IconBrandBars size={15} />
+        </span>
         <span className="font-bold">Asistente IA</span>
         {usage && (
           <span className="ml-auto text-[11px] text-[var(--muted)] tabular-nums" title="Instrucciones a la IA usadas este mes">

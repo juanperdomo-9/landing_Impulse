@@ -89,7 +89,7 @@ export default function ReferencesPanel() {
       <div className="space-y-2 rounded-xl border border-[var(--line)] p-3">
         <div className="label">Nueva referencia</div>
         <label className="btn w-full cursor-pointer justify-center">
-          {file ? `🎬 ${file.name}` : "⬆ Elegir video de referencia"}
+          {file ? `${file.name}` : "Elegir video de referencia"}
           <input
             type="file"
             accept="video/*"
@@ -125,7 +125,7 @@ export default function ReferencesPanel() {
               <input id="ref-link" className="input" value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://www.instagram.com/reel/…" />
             </Field>
             <button className="btn btn-primary w-full justify-center" disabled={!!progress} onClick={add}>
-              {progress || "✨ Analizar y guardar"}
+              {progress || "Analizar y guardar"}
             </button>
           </>
         )}
@@ -171,7 +171,7 @@ export default function ReferencesPanel() {
                 </div>
                 {open === r.id && (
                   <div className="mt-2 space-y-2">
-                    <div className="max-h-64 overflow-y-auto rounded-lg bg-[#0f0f18] p-2 text-[11px] whitespace-pre-wrap text-[var(--muted)]">
+                    <div className="max-h-64 overflow-y-auto rounded-lg bg-[var(--bg)] p-2 text-[11px] whitespace-pre-wrap text-[var(--muted)]">
                       {r.profile}
                     </div>
                     {r.link && (

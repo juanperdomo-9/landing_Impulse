@@ -71,6 +71,25 @@
 
     .header-cta-sm { min-height: 44px; padding: 0 20px; font-size: 15px; }
 
+    .header-actions-eh { display: flex; align-items: center; gap: 18px; }
+
+    .login-link {
+        color: var(--muted-2);
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        transition: color .3s ease;
+    }
+
+    .login-link:hover { color: #fff; }
+
+    .baja-link { color: var(--text); font-weight: 700; text-underline-offset: 3px; }
+    .baja-link:hover { color: var(--sun); }
+
+    @media (max-width: 420px) {
+        .login-link { display: none; }
+    }
+
     .features { padding-top: 140px; padding-bottom: 80px; }
 
     .features-grid {
@@ -258,7 +277,10 @@
             </ul>
         </nav>
 
-        <a href="{{ editor_url }}" class="btn btn-accent header-cta-sm" target="_blank" rel="noopener">Probar gratis</a>
+        <div class="header-actions-eh">
+            <a href="{{ editor_login_url }}" class="login-link">Ingresar</a>
+            <a href="{{ editor_url }}" class="btn btn-accent header-cta-sm">Probar gratis</a>
+        </div>
     </div>
 </header>
 
@@ -284,7 +306,7 @@
             Subís tu video en crudo, le decís a la IA lo que querés y lo edita por vos: subtítulos, cortes, tu marca, música y efectos. Listo para Reels, TikTok y Shorts.
         </p>
         <div class="eh-ctas fu" style="animation-delay: .9s;">
-            <a href="{{ editor_url }}" class="btn btn-accent shiny breathe" target="_blank" rel="noopener">
+            <a href="{{ editor_url }}" class="btn btn-accent shiny breathe">
                 Probalo gratis 3 días
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
@@ -400,7 +422,7 @@
             <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Exportá en vertical, cuadrado u horizontal</li>
             <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Cancelás cuando quieras desde Mercado Pago</li>
         </ul>
-        <a href="{{ editor_url }}" class="btn btn-accent shiny" target="_blank" rel="noopener">
+        <a href="{{ editor_url }}" class="btn btn-accent shiny">
             Empezar prueba gratis de 3 días
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
@@ -443,7 +465,7 @@
         <h2 class="display reveal">Tu próximo video, <em class="grad">en una frase.</em></h2>
         <p class="reveal">Probalo gratis 3 días. Y si preferís que el contenido lo hagamos nosotros, el equipo de Impulsa también se encarga.</p>
         <div class="eh-ctas reveal">
-            <a href="{{ editor_url }}" class="btn btn-accent btn-lg shiny breathe" target="_blank" rel="noopener">
+            <a href="{{ editor_url }}" class="btn btn-accent btn-lg shiny breathe">
                 Probalo gratis 3 días
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
             </a>
@@ -460,6 +482,7 @@
         </a>
         <p>© {% now "Y" %} Impulsa Studio — Marketing Digital</p>
         <a href="https://wa.me/{{ whatsapp_number }}?text=Hola%20Impulsa%2C%20tengo%20una%20consulta%20sobre%20el%20editor%20de%20video" class="footer-link" target="_blank" rel="noopener">WhatsApp {{ whatsapp_display }}</a>
+        <a href="{{ editor_baja_url }}" class="baja-link">Botón de baja</a>
     </div>
 </footer>
 

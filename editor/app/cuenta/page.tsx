@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { daysLeft, getAccount, STATUS_LABELS } from "@/lib/account";
 import { accountsEnabled, config, formatPrice } from "@/lib/config";
 import { getPreapproval, saveSubscription } from "@/lib/mercadopago";
+import BrandLogo from "@/components/BrandLogo";
 
 export const metadata = { title: "Mi cuenta — Impulsa Studio" };
 
@@ -46,10 +47,7 @@ export default async function CuentaPage({
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-8">
       <header className="mb-8 flex items-center justify-between gap-3">
-        <Link href="/" className="flex items-center gap-2 font-extrabold">
-          <span className="grad grid h-7 w-7 place-items-center rounded-lg text-sm text-white">▶</span>
-          Impulsa <span className="grad-text">Studio</span>
-        </Link>
+        <BrandLogo />
         <form action="/api/auth/signout" method="post">
           <button className="btn">Cerrar sesión</button>
         </form>

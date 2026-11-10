@@ -1,0 +1,57 @@
+# Blueprint de Render para el editor de video con IA (carpeta editor/).
+# La landing en Django ya tiene su propio servicio en Render, creado a mano: este archivo no lo toca.
+#
+# Uso: Render → New → Blueprint → elegir este repo. Render pide los valores marcados con
+# "sync: false" (las claves secretas) antes del primer despliegue.
+
+services:
+  - type: web
+    name: impulsa-editor
+    runtime: node
+    plan: starter # siempre encendido; el plan free se "duerme" y tarda ~1 minuto en volver
+    region: virginia
+    rootDir: editor
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    # solo se vuelve a publicar cuando cambia algo del editor, no con cambios de la landing
+    buildFilter:
+      paths:
+        - editor/**
+    domains:
+      - editor.impulsastudiodigital.com.ar
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://editor.impulsastudiodigital.com.ar
+
+      # Plan (mismos valores que hoy)
+      - key: PLAN_NAME
+        value: Impulsa Studio — Plan mensual
+      - key: PLAN_PRICE
+        value: "25000"
+      - key: PLAN_CURRENCY
+        value: ARS
+      - key: AI_MONTHLY_LIMIT
+        value: "200"
+      - key: TRIAL_DAYS
+        value: "3"
+      - key: TRIAL_AI_LIMIT
+        value: "20"
+
+      # Claves secretas: copiarlas del proyecto actual en Vercel (Settings → Environment Variables)
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: MP_ACCESS_TOKEN
+        sync: false
+      - key: MP_WEBHOOK_SECRET
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false

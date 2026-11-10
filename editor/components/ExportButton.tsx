@@ -5,6 +5,7 @@ import { exportFileName } from "@/lib/actions";
 import { getPlayer } from "@/lib/player";
 import { totalDuration } from "@/lib/project";
 import { store } from "@/lib/store";
+import { IconDownload } from "./Icons";
 
 export default function ExportButton({ disabled }: { disabled: boolean }) {
   const [progress, setProgress] = useState<number | null>(null);
@@ -28,7 +29,7 @@ export default function ExportButton({ disabled }: { disabled: boolean }) {
   return (
     <>
       <button className="btn btn-primary" disabled={disabled || progress !== null} onClick={run}>
-        ⬇ Exportar
+        <IconDownload /> Exportar
       </button>
       {(progress !== null || result) && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4">
@@ -52,7 +53,7 @@ export default function ExportButton({ disabled }: { disabled: boolean }) {
             ) : (
               result && (
                 <>
-                  <div className="text-lg font-bold">¡Tu video está listo! 🎉</div>
+                  <div className="text-lg font-bold">¡Tu video está listo!</div>
                   <video src={result.url} controls className="mt-4 max-h-[50vh] w-full rounded-lg bg-black" />
                   <div className="mt-4 flex gap-2">
                     <a href={result.url} download={result.name} className="btn btn-primary flex-1 justify-center">

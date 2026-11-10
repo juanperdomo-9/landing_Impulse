@@ -10,6 +10,8 @@ import { store, useEditor } from "@/lib/store";
 import type { Aspect, Fit } from "@/lib/types";
 import Chat from "./Chat";
 import ExportButton from "./ExportButton";
+import BrandLogo from "./BrandLogo";
+import { IconGift, IconRedo, IconSparkle, IconUndo, IconUser } from "./Icons";
 import Preview from "./Preview";
 import SessionGuard from "./SessionGuard";
 import SidePanel from "./SidePanel";
@@ -88,18 +90,13 @@ export default function Editor({ account }: { account?: EditorAccount }) {
       {account && <TrialWelcome account={account} />}
       <SessionGuard />
       <header className="flex h-14 shrink-0 items-center gap-3 border-b border-[var(--line)] px-4">
-        <Link href="/" className="flex items-center gap-2 font-extrabold">
-          <span className="grad grid h-7 w-7 place-items-center rounded-lg text-sm text-white">▶</span>
-          <span className="hidden sm:inline">
-            Impulsa <span className="grad-text">Studio</span>
-          </span>
-        </Link>
+        <BrandLogo size="sm" />
         <div className="mx-2 h-6 w-px bg-[var(--line)]" />
-        <button className="btn" disabled={!canUndo} onClick={() => store.undo()} title="Deshacer (Ctrl+Z)">
-          ↶
+        <button className="btn" disabled={!canUndo} onClick={() => store.undo()} title="Deshacer (Ctrl+Z)" aria-label="Deshacer">
+          <IconUndo />
         </button>
-        <button className="btn" disabled={!canRedo} onClick={() => store.redo()} title="Rehacer (Ctrl+Shift+Z)">
-          ↷
+        <button className="btn" disabled={!canRedo} onClick={() => store.redo()} title="Rehacer (Ctrl+Shift+Z)" aria-label="Rehacer">
+          <IconRedo />
         </button>
         <select
           className="input !w-auto"
@@ -129,22 +126,22 @@ export default function Editor({ account }: { account?: EditorAccount }) {
             <span className="truncate">{busy}</span>
           </div>
         )}
-        <button className="btn" onClick={() => setChatOpen((v) => !v)}>
-          ✨ <span className="hidden md:inline">Asistente IA</span>
+        <button className="btn" onClick={() => setChatOpen((v) => !v)} aria-label="Asistente IA">
+          <IconSparkle /> <span className="hidden md:inline">Asistente IA</span>
         </button>
         <ExportButton disabled={!hasAssets} />
         {account?.trialDaysLeft != null && (
           <button
-            className="btn !border-amber-500/40 text-amber-200"
+            className="btn !border-[var(--sun)]/40 text-[var(--sun)]"
             title="Ver cómo funciona la prueba"
             onClick={() => window.dispatchEvent(new Event("impulsa-welcome"))}
           >
-            🎁 Prueba: {account.trialDaysLeft} {account.trialDaysLeft === 1 ? "día" : "días"}
+            <IconGift /> Prueba: {account.trialDaysLeft} {account.trialDaysLeft === 1 ? "día" : "días"}
           </button>
         )}
         {account && (
-          <Link href="/cuenta" className="btn" title={account.email}>
-            👤 <span className="hidden xl:inline">Mi cuenta</span>
+          <Link href="/cuenta" className="btn" title={account.email} aria-label="Mi cuenta">
+            <IconUser /> <span className="hidden xl:inline">Mi cuenta</span>
           </Link>
         )}
       </header>

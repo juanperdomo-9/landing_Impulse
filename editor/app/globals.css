@@ -1,28 +1,40 @@
 @import "tailwindcss";
 
+/* Paleta de Impulsa Studio (la misma de impulsastudiodigital.com.ar) */
 :root {
-  --bg: #0b0b12;
-  --panel: #13131d;
-  --panel-2: #1a1a27;
-  --line: #262636;
-  --text: #ececf4;
-  --muted: #8b8ba3;
-  --accent: #8b5cf6;
-  --accent-2: #ec4899;
+  --bg: #0a0f2c;
+  --panel: #0e1438;
+  --panel-2: #151d4a;
+  --line: #242c5e;
+  --text: #f2f0fa;
+  --muted: #a3aad0;
+  --accent: #ff8a1f;
+  --accent-2: #e8456f;
+  --sun: #ffc93c;
+  --violet: #7a35c9;
+  --brand-gradient: linear-gradient(90deg, #7a35c9, #e8456f, #ff7a1a, #ffc93c);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html,
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: "Inter Variable", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-sans), "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), "Bricolage Grotesque", var(--font-sans), sans-serif;
+  letter-spacing: -0.02em;
 }
 
 .grad {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--brand-gradient);
 }
 .grad-text {
-  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  background: var(--brand-gradient);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -31,63 +43,117 @@ body {
   background: var(--panel);
   border: 1px solid var(--line);
 }
+
+/* Logo sobre su chip blanco, como en la landing */
+.brand-chip {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  padding: 4px 10px;
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+.brand-chip:hover {
+  transform: rotate(-2deg) scale(1.03);
+  box-shadow: 0 10px 30px rgba(255, 138, 31, 0.25);
+}
+
+/* Avatar del asistente: las barras del logo */
+.brand-mark {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  border-radius: 0.6rem;
-  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
   font-size: 0.85rem;
   font-weight: 600;
   background: var(--panel-2);
   border: 1px solid var(--line);
-  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  transition:
+    transform 0.45s var(--ease),
+    box-shadow 0.45s var(--ease),
+    background 0.2s,
+    border-color 0.2s,
+    opacity 0.2s;
 }
 .btn:hover:not(:disabled) {
-  border-color: #3b3b55;
-  background: #20202f;
+  border-color: var(--sun);
+  background: #1b2458;
+  transform: translateY(-1px);
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+  transition-duration: 0.12s;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--sun);
+  outline-offset: 2px;
 }
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   border-color: transparent;
-  color: white;
+  color: var(--bg);
+  font-weight: 700;
+  box-shadow: 0 6px 20px rgba(255, 138, 31, 0.25);
 }
 .btn-primary:hover:not(:disabled) {
-  filter: brightness(1.1);
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: #ff9a3d;
+  border-color: transparent;
+  box-shadow: 0 10px 30px rgba(255, 138, 31, 0.4);
 }
 .input {
   width: 100%;
-  background: #0f0f18;
+  background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 0.5rem;
-  padding: 0.4rem 0.6rem;
+  border-radius: 0.6rem;
+  padding: 0.45rem 0.7rem;
   font-size: 0.85rem;
   color: var(--text);
+  transition: border-color 0.2s;
 }
 .input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--sun);
+}
+.input::placeholder {
+  color: #7a82ad;
 }
 .label {
   font-size: 0.72rem;
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 .scroll-thin::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 .scroll-thin::-webkit-scrollbar-thumb {
-  background: #2a2a3d;
+  background: var(--line);
   border-radius: 8px;
 }
 input[type="range"] {
   accent-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .brand-chip {
+    transition: none;
+  }
 }

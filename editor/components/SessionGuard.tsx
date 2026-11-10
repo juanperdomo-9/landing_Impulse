@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { clearSession, restoreSession, savedSession, startAutosave } from "@/lib/autosave";
 import { store } from "@/lib/store";
+import { IconAlert } from "./Icons";
 
 const DEVICE_NOTICE_KEY = "impulsa-device-notice";
 
@@ -126,7 +127,9 @@ export default function SessionGuard() {
       {(deviceNotice || saveError) && (
         <div className="fixed bottom-4 left-1/2 z-40 w-[min(560px,calc(100%-2rem))] -translate-x-1/2">
           <div className="panel flex items-start gap-3 rounded-xl p-3 text-sm shadow-2xl">
-            <span aria-hidden="true">⚠️</span>
+            <span className="mt-0.5 text-[var(--sun)]">
+              <IconAlert size={18} />
+            </span>
             <p className="flex-1 text-[var(--muted)]">
               {saveError
                 ? "Tu navegador no tiene espacio para guardar este proyecto automáticamente. Exportá el video antes de cerrar la pestaña."

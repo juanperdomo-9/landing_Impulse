@@ -12,17 +12,28 @@ import Field from "./Field";
 import PublishPanel from "./PublishPanel";
 import ReferencesPanel from "./ReferencesPanel";
 import Inspector from "./Inspector";
+import {
+  IconCaptions,
+  IconFolder,
+  IconPalette,
+  IconPen,
+  IconSliders,
+  IconSparkle,
+  IconStar,
+  IconType,
+  IconVolume,
+} from "./Icons";
 
 const TABS = [
-  { id: "media", icon: "📁", label: "Medios" },
-  { id: "brand", icon: "🎨", label: "Marca" },
-  { id: "refs", icon: "⭐", label: "Referencias" },
-  { id: "subs", icon: "🔤", label: "Subtítulos" },
-  { id: "text", icon: "T", label: "Texto" },
-  { id: "sfx", icon: "🔊", label: "Sonidos" },
-  { id: "fx", icon: "✨", label: "Efectos" },
-  { id: "publish", icon: "✍️", label: "Publicar" },
-  { id: "props", icon: "⚙", label: "Propiedades" },
+  { id: "media", icon: IconFolder, label: "Medios" },
+  { id: "brand", icon: IconPalette, label: "Marca" },
+  { id: "refs", icon: IconStar, label: "Referencias" },
+  { id: "subs", icon: IconCaptions, label: "Subtítulos" },
+  { id: "text", icon: IconType, label: "Texto" },
+  { id: "sfx", icon: IconVolume, label: "Sonidos" },
+  { id: "fx", icon: IconSparkle, label: "Efectos" },
+  { id: "publish", icon: IconPen, label: "Publicar" },
+  { id: "props", icon: IconSliders, label: "Propiedades" },
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
@@ -40,9 +51,10 @@ export default function SidePanel() {
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex flex-col items-center gap-0.5 rounded-lg py-2 text-[10px] font-semibold ${tab === t.id ? "bg-[var(--panel-2)] text-white" : "text-[var(--muted)] hover:text-white"}`}
+            className={`flex flex-col items-center gap-1 rounded-lg py-2 text-[10px] font-semibold transition-colors ${tab === t.id ? "bg-[var(--panel-2)] text-[var(--sun)]" : "text-[var(--muted)] hover:text-white"}`}
+            aria-current={tab === t.id ? "page" : undefined}
           >
-            <span className="text-base">{t.icon}</span>
+            <t.icon size={18} />
             {t.label}
           </button>
         ))}
@@ -67,7 +79,7 @@ function MediaTab() {
   return (
     <div className="space-y-3">
       <label className="btn btn-primary w-full cursor-pointer justify-center">
-        ⬆ Subir videos, fotos o música
+        Subir videos, fotos o música
         <input
           type="file"
           multiple
@@ -113,7 +125,7 @@ function MediaTab() {
               {a.name}
             </div>
             <button
-              className="m-1.5 w-[calc(100%-12px)] rounded bg-[#0f0f18] py-1 text-[11px] font-semibold hover:bg-[var(--accent)]"
+              className="m-1.5 w-[calc(100%-12px)] rounded bg-[var(--bg)] py-1 text-[11px] font-semibold hover:bg-[var(--accent)] hover:text-[var(--bg)]"
               onClick={() => {
                 const t = store.get().time;
                 if (a.kind === "video")
@@ -173,7 +185,7 @@ function SubtitlesTab() {
           </select>
         </div>
         <button className="btn btn-primary w-full justify-center" disabled={!hasClips || !!busy} onClick={generate}>
-          🔤 Generar subtítulos
+          Generar subtítulos
         </button>
         <p className="text-[11px] text-[var(--muted)]">
           La primera vez se descarga el modelo de voz (Whisper) a tu navegador.

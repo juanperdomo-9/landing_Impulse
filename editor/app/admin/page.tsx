@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { currentPeriod, getAccount, isAdminEmail, STATUS_LABELS, trialEndsAt } from "@/lib/account";
 import { accountsEnabled, config, formatPrice } from "@/lib/config";
 import { supabaseAdmin } from "@/lib/supabase/server";
+import BrandLogo from "@/components/BrandLogo";
 
 export const metadata = { title: "Administración — Impulsa Studio" };
 
@@ -55,7 +56,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-4 py-8">
       <header className="mb-6 flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Administración</h1>
+        <div className="flex items-center gap-4">
+          <BrandLogo size="sm" />
+          <h1 className="text-2xl font-bold">Administración</h1>
+        </div>
         <Link href="/cuenta" className="btn">
           Mi cuenta
         </Link>
@@ -63,7 +67,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
       {missingConfig.length > 0 && (
         <div className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-          <b>Falta configurar en Vercel:</b> {missingConfig.join(" · ")}. Mira CONFIGURACION.md.
+          <b>Falta configurar en Render (Environment):</b> {missingConfig.join(" · ")}. Mira CONFIGURACION.md.
         </div>
       )}
 

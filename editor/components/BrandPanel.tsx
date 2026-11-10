@@ -159,7 +159,7 @@ export default function BrandPanel() {
           {busy ? "Guardando…" : "Guardar marca"}
         </button>
         <button className="btn btn-primary w-full justify-center" disabled={busy || !hasVideo} onClick={apply}>
-          🎨 Aplicar mi marca al video
+          Aplicar mi marca al video
         </button>
         {!hasVideo && <p className="text-[11px] text-[var(--muted)]">Sube un video para aplicar la marca.</p>}
         {status && <p className="text-xs text-emerald-300">{status}</p>}

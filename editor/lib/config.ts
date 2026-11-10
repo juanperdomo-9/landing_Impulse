@@ -16,6 +16,8 @@ export const config = {
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean),
   siteUrl: (process.env.NEXT_PUBLIC_SITE_URL || "").replace(/\/$/, ""),
+  /** Sales page of the editor, on the Impulsa Studio website: the editor's home page sends visitors there. */
+  marketingUrl: process.env.MARKETING_URL || "https://impulsastudiodigital.com.ar/editor-ia/",
 };
 
 export const accountsEnabled = () => !!(config.supabaseUrl && config.supabaseKey);

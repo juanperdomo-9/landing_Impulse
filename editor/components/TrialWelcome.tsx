@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { EditorAccount } from "./Editor";
+import { IconGift } from "./Icons";
 
 /** Welcome card shown the first time a trial user opens the editor (once per account and browser). */
 export default function TrialWelcome({ account }: { account: EditorAccount }) {
@@ -35,7 +36,9 @@ export default function TrialWelcome({ account }: { account: EditorAccount }) {
   return (
     <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/70 p-4">
       <div className="panel w-full max-w-lg rounded-2xl p-6">
-        <div className="text-3xl">🎁</div>
+        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--sun)] text-[var(--bg)]">
+          <IconGift size={24} />
+        </div>
         <h2 className="mt-2 text-2xl font-black">¡Bienvenida/o a Impulsa Studio!</h2>
         <p className="mt-1 text-[var(--muted)]">
           Tenés <b className="text-[var(--text)]">{days} {days === 1 ? "día" : "días"} de prueba gratis</b>, sin tarjeta y
@@ -44,26 +47,26 @@ export default function TrialWelcome({ account }: { account: EditorAccount }) {
 
         <div className="mt-5 space-y-3 text-sm">
           <div className="rounded-xl bg-[var(--panel-2)] p-3">
-            <div className="font-bold">✨ {left} créditos de IA para probar</div>
+            <div className="font-bold">{left} créditos de IA para probar</div>
             <p className="mt-1 text-[var(--muted)]">
               Cada crédito es un pedido a la IA: una instrucción en el chat (por ejemplo &quot;poné subtítulos y quitá los
               silencios&quot;), un texto para publicar o el análisis de un Reel de referencia.
             </p>
           </div>
           <div className="rounded-xl bg-[var(--panel-2)] p-3">
-            <div className="font-bold">✂️ Todo lo demás es ilimitado</div>
+            <div className="font-bold">Todo lo demás es ilimitado</div>
             <p className="mt-1 text-[var(--muted)]">
               Subir videos, subtítulos automáticos, cortes, textos, fotos, música, sonidos, efectos y exportar no gastan
               créditos.
             </p>
           </div>
           <div className="rounded-xl bg-[var(--panel-2)] p-3">
-            <div className="font-bold">🚀 Para empezar</div>
+            <div className="font-bold">Para empezar</div>
             <ol className="mt-1 list-decimal space-y-0.5 pl-5 text-[var(--muted)]">
               <li>Subí tu video (arrastralo al centro).</li>
-              <li>Cargá tu marca en 🎨 Marca: logo, colores y tipografía.</li>
+              <li>Cargá tu marca en la pestaña Marca: logo, colores y tipografía.</li>
               <li>Pedile a la IA lo que quieras en el chat de la derecha.</li>
-              <li>Exportá y publicá. En ✍️ Publicar te escribe el texto.</li>
+              <li>Exportá y publicá. En la pestaña Publicar te escribe el texto.</li>
             </ol>
           </div>
           <p className="text-xs text-[var(--muted)]">

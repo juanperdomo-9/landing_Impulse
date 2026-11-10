@@ -6,6 +6,7 @@ import { getPlayer, Player, setPlayer } from "@/lib/player";
 import { canvasSize, contentDuration, fmt } from "@/lib/project";
 import { overlayBounds } from "@/lib/render";
 import { store, useEditor } from "@/lib/store";
+import { IconUpload } from "./Icons";
 import type { Project } from "@/lib/types";
 
 export default function Preview() {
@@ -109,8 +110,10 @@ export default function Preview() {
           onPointerUp={onUp}
         />
         {empty && (
-          <label className="absolute inset-6 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[var(--line)] text-center hover:border-[var(--accent)]">
-            <div className="grad grid h-14 w-14 place-items-center rounded-2xl text-2xl text-white">⬆</div>
+          <label className="absolute inset-6 flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[var(--line)] text-center hover:border-[var(--sun)]">
+            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[var(--accent)] text-[var(--bg)]">
+              <IconUpload size={26} />
+            </div>
             <div className="text-lg font-bold">Arrastra aquí tus videos en crudo</div>
             <div className="max-w-sm text-sm text-[var(--muted)]">
               También fotos (logos, imágenes) y música. Todo se procesa en tu navegador.

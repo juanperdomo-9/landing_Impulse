@@ -1,8 +1,8 @@
 # Configurar Impulsa Studio para vender
 
 Sigue estos pasos en orden. Necesitas tres cuentas gratuitas: **Supabase** (usuarios y datos),
-**Mercado Pago** (cobros) y **Vercel** (donde está publicada la web). Al final, todo se pega como
-variables en Vercel.
+**Mercado Pago** (cobros) y **Render** (donde está publicada la web, en `editor.impulsastudiodigital.com.ar`).
+Al final, todo se pega como variables en Render.
 
 Mientras no completes la parte de Supabase, la web funciona en "modo abierto": cualquiera abre el editor
 y el asistente IA queda desactivado (para que nadie gaste tu saldo de Claude).
@@ -21,8 +21,8 @@ y el asistente IA queda desactivado (para que nadie gaste tu saldo de Claude).
    propio (paso 5); recién entonces Supabase deja editar **Authentication → Emails → Magic Link** y
    **Confirm signup**. Agrega al mensaje la línea `<p style="font-size:28px;font-weight:bold">{{ .Token }}</p>`.
 4. Ve a **Authentication → URL Configuration**:
-   - **Site URL:** la dirección de tu web (ej. `https://impulsa-studiodigital.vercel.app`).
-   - **Redirect URLs → Add URL:** `https://impulsa-studiodigital.vercel.app/**` (con tu dirección).
+   - **Site URL:** la dirección de tu web (ej. `https://editor.impulsastudiodigital.com.ar`).
+   - **Redirect URLs → Add URL:** `https://editor.impulsastudiodigital.com.ar/**` (con tu dirección).
 5. **Importante para vender:** el servidor de correo incluido en Supabase solo envía unos pocos mails por hora.
    Para clientes reales configura un correo propio en **Authentication → Emails → SMTP Settings**.
    Una opción gratuita es [Resend](https://resend.com) (3.000 mails/mes): crea una cuenta, verifica tu dominio y
@@ -39,15 +39,17 @@ y el asistente IA queda desactivado (para que nadie gaste tu saldo de Claude).
 3. En la aplicación, ve a **Credenciales de producción** y copia el **Access Token** → variable `MP_ACCESS_TOKEN`.
    (Puede que te pida completar datos de tu negocio para activar las credenciales de producción.)
 4. Ve a **Webhooks → Configurar notificaciones**:
-   - **URL de producción:** `https://TU-WEB/api/mp/webhook` (ej. `https://impulsa-studiodigital.vercel.app/api/mp/webhook`)
+   - **URL de producción:** `https://TU-WEB/api/mp/webhook` (ej. `https://editor.impulsastudiodigital.com.ar/api/mp/webhook`)
    - **Eventos:** marca **Planes y suscripciones**.
    - Guarda y copia la **clave secreta** → variable `MP_WEBHOOK_SECRET` (**obligatoria**: sin ella no se verifica que los avisos vengan de Mercado Pago; el panel `/admin` avisa si falta).
 
 Para probar sin cobrar dinero real, Mercado Pago ofrece **credenciales y usuarios de prueba** en la misma sección.
 
-## 3. Vercel — pegar las variables
+## 3. Render — pegar las variables
 
-En tu proyecto de Vercel: **Settings → Environment Variables**. Agrega cada una (Key = nombre, Value = valor):
+El archivo `render.yaml` (en la raíz del repo) crea el servicio: **Render → New → Blueprint** y elegir el repo.
+Render pide las claves secretas antes del primer despliegue; el resto ya viene cargado. Para cambiarlas después:
+**impulsa-editor → Environment**. Las variables son (Key = nombre, Value = valor):
 
 | Variable | Qué poner |
 |---|---|
@@ -63,9 +65,9 @@ En tu proyecto de Vercel: **Settings → Environment Variables**. Agrega cada un
 | `TRIAL_DAYS` | Días de prueba gratis desde que se registran (por defecto `3`; `0` = sin prueba) |
 | `TRIAL_AI_LIMIT` | Créditos de IA durante la prueba (por defecto `20`) |
 | `ADMIN_EMAILS` | Tu mail (para entrar al panel `/admin`). Varios, separados por coma |
-| `NEXT_PUBLIC_SITE_URL` | La dirección de tu web (ej. `https://impulsa-studiodigital.vercel.app`) |
+| `NEXT_PUBLIC_SITE_URL` | La dirección de tu web (ej. `https://editor.impulsastudiodigital.com.ar`) |
 
-Después ve a **Deployments → … → Redeploy** para que tome los cambios.
+Las variables que empiezan con `NEXT_PUBLIC_` se graban al compilar: si cambias alguna, usa **Manual Deploy → Deploy latest commit**.
 
 ## 4. Probar
 
@@ -78,7 +80,8 @@ Después ve a **Deployments → … → Redeploy** para que tome los cambios.
 
 ## Cuánto cuesta mantenerla
 
-- **Vercel, Supabase y Resend**: gratis en sus planes iniciales (alcanzan para empezar).
+- **Render**: el plan Starter (siempre encendido) cuesta unos 7 dólares al mes.
+- **Supabase y Resend**: gratis en sus planes iniciales (alcanzan para empezar).
 - **Claude (la IA)**: con el modelo Haiku, cada instrucción cuesta una fracción de centavo de dólar; con el
   límite de 200 instrucciones por cliente por mes, un cliente que use todo su límite te cuesta como máximo unos 2 dólares al mes (medio centavo a 1 centavo por instrucción).
 - **Mercado Pago**: cobra su comisión habitual por cada pago recibido.

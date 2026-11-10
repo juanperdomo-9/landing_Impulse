@@ -20,7 +20,7 @@ export async function guardAi(countsAsCredit: boolean): Promise<{ usage?: Usage 
     return Response.json(
       {
         error:
-          "El asistente IA aún no tiene su clave de Claude. Añade la variable ANTHROPIC_API_KEY (en Vercel: Settings → Environment Variables) y vuelve a implementar. Mientras tanto puedes editar con las herramientas del panel izquierdo.",
+          "El asistente IA aún no tiene su clave de Claude. Añade la variable ANTHROPIC_API_KEY (en Render: impulsa-editor → Environment) y vuelve a publicar. Mientras tanto puedes editar con las herramientas del panel izquierdo.",
       },
       { status: 500 },
     );
