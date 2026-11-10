@@ -16,8 +16,8 @@ export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://impulsastu
 export const withBase = (path: string) => `${BASE_PATH}${path}`;
 
 /**
- * Absolute public URL of an app path. Route handlers use it instead of req.url, because behind the
- * Cloudflare proxy req.url carries the internal Render address, not the visitor's one.
+ * Absolute public URL of an app path. Route handlers use it instead of req.url, because behind
+ * Render's proxy req.url may carry the internal address, not the visitor's one.
  */
 export const publicUrl = (path: string) => `${SITE_URL}${BASE_PATH}${path}`;
 

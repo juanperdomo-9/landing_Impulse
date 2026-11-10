@@ -1,28 +1,29 @@
-# Blueprint de Render para el editor de video con IA (carpeta editor/).
-# La landing en Django ya tiene su propio servicio en Render, creado a mano: este archivo no lo toca.
-#
-# El editor se ve en impulsastudiodigital.com.ar/editor gracias al puente de Cloudflare
-# (carpeta cloudflare/editor-proxy/), que le pasa esas visitas a este servicio.
+# Blueprint de Render: UN solo servicio para toda la web impulsastudiodigital.com.ar
+#   /           → la landing (páginas fijas en editor/sitio/, generadas con `python manage.py exportar_sitio`)
+#   /editor-ia/ → página de venta del editor
+#   /editor     → el editor de video con IA (Next.js)
 #
 # Uso: Render → New → Blueprint → elegir este repo. Render pide los valores marcados con
 # "sync: false" (las claves secretas) antes del primer despliegue.
+# Cuando este servicio ande, el servicio viejo de la landing (Django) se puede borrar.
 
 services:
   - type: web
-    name: impulsa-editor
+    name: impulsa-web
     runtime: node
-    # gratis: se "duerme" tras 15 min sin visitas y la primera vuelve en ~1 minuto.
-    # Para que esté siempre encendido, cambiar a "starter" (unos 7 dólares al mes).
+    # gratis: se "duerme" tras 15 min sin visitas y la primera vuelve en ~1 minuto
+    # (UptimeRobot visitando /editor/api/health cada 5 min lo mantiene despierto).
+    # Para que esté siempre encendido sin eso, cambiar a "starter" (unos 7 dólares al mes).
     plan: free
     region: virginia
     rootDir: editor
     buildCommand: npm ci && npm run build
     startCommand: npm start
+    healthCheckPath: /editor/api/health
     autoDeploy: true
-    # solo se vuelve a publicar cuando cambia algo del editor, no con cambios de la landing
-    buildFilter:
-      paths:
-        - editor/**
+    domains:
+      - impulsastudiodigital.com.ar
+      - www.impulsastudiodigital.com.ar
     envVars:
       - key: NODE_VERSION
         value: "22"
@@ -44,7 +45,7 @@ services:
       - key: TRIAL_AI_LIMIT
         value: "20"
 
-      # Claves secretas: copiarlas del proyecto actual en Vercel (Settings → Environment Variables)
+      # Claves secretas: las pasa la socia (están en su proyecto de Vercel)
       - key: ANTHROPIC_API_KEY
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_URL

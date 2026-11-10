@@ -1,7 +1,7 @@
 # Configurar Impulsa Studio para vender
 
 Sigue estos pasos en orden. Necesitas tres cuentas gratuitas: **Supabase** (usuarios y datos),
-**Mercado Pago** (cobros) y **Render** (donde corre el editor) y **Cloudflare** (lo muestra en `impulsastudiodigital.com.ar/editor`).
+**Mercado Pago** (cobros) y **Render** (un solo servicio publica toda la web: la landing en `/` y el editor en `/editor`).
 Al final, todo se pega como variables en Render.
 
 Mientras no completes la parte de Supabase, la web funciona en "modo abierto": cualquiera abre el editor
@@ -69,14 +69,16 @@ Render pide las claves secretas antes del primer despliegue; el resto ya viene c
 
 Las variables que empiezan con `NEXT_PUBLIC_` se graban al compilar: si cambias alguna, usa **Manual Deploy → Deploy latest commit**.
 
-## 3b. Cloudflare — mostrar el editor en impulsastudiodigital.com.ar/editor
+## 3b. Dominio — apuntar impulsastudiodigital.com.ar al servicio
 
-El editor corre en Render con una dirección propia (`https://impulsa-editor.onrender.com`). Un Worker de Cloudflare
-(carpeta `cloudflare/editor-proxy/` de este repo) le pasa las visitas de `/editor`; el resto del dominio sigue yendo a la landing.
+1. Render → servicio `impulsa-web` → **Settings → Custom Domains**: ya trae `impulsastudiodigital.com.ar` y `www`;
+   Render muestra qué registros DNS poner.
+2. Cloudflare → DNS: cambiar los registros del dominio (y `www`) por los que indica Render. Mientras Render verifica,
+   dejar la nube en gris (sin proxy).
+3. Cuando la web y el editor abran bien en el dominio, borrar el servicio viejo de la landing (Django) en Render.
 
-1. Cloudflare → **Workers & Pages → Create → Create Worker**, nombre `impulsa-editor-proxy`, y pegar el contenido de `worker.js`.
-2. En el Worker: **Settings → Variables** → agregar `EDITOR_ORIGIN` = la dirección `.onrender.com` del servicio.
-3. En el Worker: **Settings → Domains & Routes → Add route**: `impulsastudiodigital.com.ar/editor*` (zona `impulsastudiodigital.com.ar`).
+La landing se edita en Django (`core/templates/`) y se publica con `python manage.py exportar_sitio`, que la genera en
+`editor/sitio/`; después se suben los cambios.
 
 ## 4. Probar
 

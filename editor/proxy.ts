@@ -9,7 +9,7 @@ export async function proxy(request: NextRequest) {
   if (!url || !key) return NextResponse.next(); // accounts not configured yet: open mode
 
   // Paths here come without the /editor base path. Redirects use the public address: behind the
-  // Cloudflare proxy, request.nextUrl carries the internal Render host.
+  // Render proxy, request.nextUrl may carry the internal host.
 
   // A sign-in link that landed on the home page (Supabase "Site URL" fallback): finish it in /auth/callback.
   if (request.nextUrl.pathname === "/" && (request.nextUrl.searchParams.has("code") || request.nextUrl.searchParams.has("token_hash"))) {
