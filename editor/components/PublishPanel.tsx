@@ -1,5 +1,6 @@
 "use client";
 
+import { withBase } from "@/lib/paths";
 import { useState } from "react";
 import { describeProject, transcriptForAI } from "@/lib/actions";
 import { describeBrand } from "@/lib/brand";
@@ -33,7 +34,7 @@ export default function PublishPanel() {
           /* continue without the speech */
         }
       }
-      const res = await fetch("/api/copy", {
+      const res = await fetch(withBase("/api/copy"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

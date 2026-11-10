@@ -7,6 +7,7 @@ import { executeTool } from "@/lib/aiExecutor";
 import { imageThumb } from "@/lib/media";
 import { getPlayer } from "@/lib/player";
 import { store, useEditor } from "@/lib/store";
+import { withBase } from "@/lib/paths";
 import { IconBrandBars } from "./Icons";
 
 type Msg = Anthropic.Beta.BetaMessageParam;
@@ -164,7 +165,7 @@ export default function Chat({ usage: initialUsage }: { usage?: { used: number; 
       history.current.push({ role: "user", content });
 
       for (let step = 0; step < MAX_STEPS; step++) {
-        const res = await fetch("/api/assistant", {
+        const res = await fetch(withBase("/api/assistant"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ messages: compactHistory(history.current) }),

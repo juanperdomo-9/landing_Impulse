@@ -2,15 +2,16 @@ import BrandLogo from "@/components/BrandLogo";
 import { redirect } from "next/navigation";
 import { getAccount } from "@/lib/account";
 import { accountsEnabled } from "@/lib/config";
+import { safeNext } from "@/lib/paths";
 import LoginForm from "./LoginForm";
 
 export const metadata = { title: "Ingresar — Impulsa Studio" };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const { next, error } = await searchParams;
-  const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : "/editor";
-  if (!accountsEnabled()) redirect(safeNext);
-  if (await getAccount()) redirect(safeNext);
+  const nextPath = safeNext(next);
+  if (!accountsEnabled()) redirect(nextPath);
+  if (await getAccount()) redirect(nextPath);
 
   return (
     <main className="grid min-h-screen place-items-center px-4">
@@ -19,7 +20,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <BrandLogo />
         </div>
         <div className="panel rounded-2xl p-6">
-          <LoginForm next={safeNext} linkError={!!error} />
+          <LoginForm next={nextPath} linkError={!!error} />
         </div>
       </div>
     </main>

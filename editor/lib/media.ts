@@ -1,5 +1,6 @@
 "use client";
 
+import { withBase } from "@/lib/paths";
 import { getPlayer } from "./player";
 import { uid } from "./project";
 import { store } from "./store";
@@ -129,7 +130,7 @@ const pending = new Map<
 
 function getWorker() {
   if (!worker) {
-    worker = new Worker("/whisper-worker.js", { type: "module" });
+    worker = new Worker(withBase("/whisper-worker.js"), { type: "module" });
     // the worker could not start (e.g. the speech model library failed to download)
     worker.onerror = (ev) => {
       ev.preventDefault?.();

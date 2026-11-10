@@ -1,6 +1,7 @@
 import "server-only";
 import crypto from "node:crypto";
 import { config } from "@/lib/config";
+import { publicUrl } from "@/lib/paths";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 /** Mercado Pago subscriptions ("preapproval" API): https://www.mercadopago.com/developers/es/docs/subscriptions */
@@ -32,15 +33,14 @@ async function mp<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
-export async function createSubscription(userId: string, email: string, origin: string) {
-  const site = config.siteUrl || origin;
+export async function createSubscription(userId: string, email: string) {
   const pre = await mp<Preapproval>("/preapproval", {
     method: "POST",
     body: JSON.stringify({
       reason: config.planName,
       external_reference: userId,
       payer_email: email,
-      back_url: `${site}/cuenta`,
+      back_url: publicUrl("/cuenta"),
       status: "pending",
       auto_recurring: {
         frequency: 1,

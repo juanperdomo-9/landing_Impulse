@@ -29,7 +29,7 @@ async function setManual(formData: FormData) {
 
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   await connection();
-  if (!accountsEnabled()) redirect("/editor");
+  if (!accountsEnabled()) redirect("/");
   await requireAdmin();
   const { q = "" } = await searchParams;
 

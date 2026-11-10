@@ -5,6 +5,7 @@ import { daysLeft, getAccount, STATUS_LABELS } from "@/lib/account";
 import { accountsEnabled, config, formatPrice } from "@/lib/config";
 import { getPreapproval, saveSubscription } from "@/lib/mercadopago";
 import BrandLogo from "@/components/BrandLogo";
+import { withBase } from "@/lib/paths";
 
 export const metadata = { title: "Mi cuenta — Impulsa Studio" };
 
@@ -14,7 +15,7 @@ export default async function CuentaPage({
   searchParams: Promise<{ preapproval_id?: string; error?: string; baja?: string }>;
 }) {
   await connection();
-  if (!accountsEnabled()) redirect("/editor");
+  if (!accountsEnabled()) redirect("/");
   const params = await searchParams;
   let account = await getAccount();
   if (!account) redirect("/login?next=/cuenta");
@@ -48,7 +49,7 @@ export default async function CuentaPage({
     <main className="mx-auto min-h-screen max-w-2xl px-4 py-8">
       <header className="mb-8 flex items-center justify-between gap-3">
         <BrandLogo />
-        <form action="/api/auth/signout" method="post">
+        <form action={withBase("/api/auth/signout")} method="post">
           <button className="btn">Cerrar sesión</button>
         </form>
       </header>
@@ -107,7 +108,7 @@ export default async function CuentaPage({
                   {new Date(account.trialEndsAt!).toLocaleDateString("es-AR", { day: "numeric", month: "long" })}). Suscríbete
                   cuando quieras para seguir usando Impulsa Studio sin cortes.
                 </p>
-                <form action="/api/mp/subscribe" method="post" className="mt-3">
+                <form action={withBase("/api/mp/subscribe")} method="post" className="mt-3">
                   <button className="btn btn-primary w-full justify-center">
                     Suscribirme con Mercado Pago · {formatPrice()}/mes
                   </button>
@@ -120,7 +121,7 @@ export default async function CuentaPage({
                 cuando quieras desde el botón de baja, acá abajo.
               </p>
             )}
-            <Link href="/editor" className="btn btn-primary w-full justify-center !py-2.5">
+            <Link href="/" className="btn btn-primary w-full justify-center !py-2.5">
               Abrir el editor
             </Link>
           </div>
@@ -135,7 +136,7 @@ export default async function CuentaPage({
               Suscríbete para usar el editor con IA: subtítulos automáticos, cortes, fotos, música, efectos y el
               asistente que edita por ti.
             </p>
-            <form action="/api/mp/subscribe" method="post">
+            <form action={withBase("/api/mp/subscribe")} method="post">
               <button className="btn btn-primary w-full justify-center !py-2.5">
                 Suscribirme con Mercado Pago · {formatPrice()}/mes
               </button>
@@ -154,7 +155,7 @@ export default async function CuentaPage({
             Al darte de baja se cancela la suscripción en Mercado Pago y no se te hacen más cobros. Vas a poder volver a
             suscribirte cuando quieras.
           </p>
-          <form action="/api/mp/cancel" method="post" className="mt-4">
+          <form action={withBase("/api/mp/cancel")} method="post" className="mt-4">
             <button className="btn w-full justify-center !border-red-500/40 !py-2.5 text-red-300">
               Confirmar baja de la suscripción
             </button>

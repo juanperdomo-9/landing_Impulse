@@ -1,7 +1,7 @@
 # Configurar Impulsa Studio para vender
 
 Sigue estos pasos en orden. Necesitas tres cuentas gratuitas: **Supabase** (usuarios y datos),
-**Mercado Pago** (cobros) y **Render** (donde está publicada la web, en `editor.impulsastudiodigital.com.ar`).
+**Mercado Pago** (cobros) y **Render** (donde corre el editor) y **Cloudflare** (lo muestra en `impulsastudiodigital.com.ar/editor`).
 Al final, todo se pega como variables en Render.
 
 Mientras no completes la parte de Supabase, la web funciona en "modo abierto": cualquiera abre el editor
@@ -21,8 +21,8 @@ y el asistente IA queda desactivado (para que nadie gaste tu saldo de Claude).
    propio (paso 5); recién entonces Supabase deja editar **Authentication → Emails → Magic Link** y
    **Confirm signup**. Agrega al mensaje la línea `<p style="font-size:28px;font-weight:bold">{{ .Token }}</p>`.
 4. Ve a **Authentication → URL Configuration**:
-   - **Site URL:** la dirección de tu web (ej. `https://editor.impulsastudiodigital.com.ar`).
-   - **Redirect URLs → Add URL:** `https://editor.impulsastudiodigital.com.ar/**` (con tu dirección).
+   - **Site URL:** la dirección de tu web (ej. `https://impulsastudiodigital.com.ar/editor`).
+   - **Redirect URLs → Add URL:** `https://impulsastudiodigital.com.ar/editor/**` (con tu dirección).
 5. **Importante para vender:** el servidor de correo incluido en Supabase solo envía unos pocos mails por hora.
    Para clientes reales configura un correo propio en **Authentication → Emails → SMTP Settings**.
    Una opción gratuita es [Resend](https://resend.com) (3.000 mails/mes): crea una cuenta, verifica tu dominio y
@@ -39,7 +39,7 @@ y el asistente IA queda desactivado (para que nadie gaste tu saldo de Claude).
 3. En la aplicación, ve a **Credenciales de producción** y copia el **Access Token** → variable `MP_ACCESS_TOKEN`.
    (Puede que te pida completar datos de tu negocio para activar las credenciales de producción.)
 4. Ve a **Webhooks → Configurar notificaciones**:
-   - **URL de producción:** `https://TU-WEB/api/mp/webhook` (ej. `https://editor.impulsastudiodigital.com.ar/api/mp/webhook`)
+   - **URL de producción:** `https://TU-WEB/api/mp/webhook` (ej. `https://impulsastudiodigital.com.ar/editor/api/mp/webhook`)
    - **Eventos:** marca **Planes y suscripciones**.
    - Guarda y copia la **clave secreta** → variable `MP_WEBHOOK_SECRET` (**obligatoria**: sin ella no se verifica que los avisos vengan de Mercado Pago; el panel `/admin` avisa si falta).
 
@@ -65,9 +65,18 @@ Render pide las claves secretas antes del primer despliegue; el resto ya viene c
 | `TRIAL_DAYS` | Días de prueba gratis desde que se registran (por defecto `3`; `0` = sin prueba) |
 | `TRIAL_AI_LIMIT` | Créditos de IA durante la prueba (por defecto `20`) |
 | `ADMIN_EMAILS` | Tu mail (para entrar al panel `/admin`). Varios, separados por coma |
-| `NEXT_PUBLIC_SITE_URL` | La dirección de tu web (ej. `https://editor.impulsastudiodigital.com.ar`) |
+| `NEXT_PUBLIC_SITE_URL` | La dirección de tu web, sin `/editor` (`https://impulsastudiodigital.com.ar`) |
 
 Las variables que empiezan con `NEXT_PUBLIC_` se graban al compilar: si cambias alguna, usa **Manual Deploy → Deploy latest commit**.
+
+## 3b. Cloudflare — mostrar el editor en impulsastudiodigital.com.ar/editor
+
+El editor corre en Render con una dirección propia (`https://impulsa-editor.onrender.com`). Un Worker de Cloudflare
+(carpeta `cloudflare/editor-proxy/` de este repo) le pasa las visitas de `/editor`; el resto del dominio sigue yendo a la landing.
+
+1. Cloudflare → **Workers & Pages → Create → Create Worker**, nombre `impulsa-editor-proxy`, y pegar el contenido de `worker.js`.
+2. En el Worker: **Settings → Variables** → agregar `EDITOR_ORIGIN` = la dirección `.onrender.com` del servicio.
+3. En el Worker: **Settings → Domains & Routes → Add route**: `impulsastudiodigital.com.ar/editor*` (zona `impulsastudiodigital.com.ar`).
 
 ## 4. Probar
 

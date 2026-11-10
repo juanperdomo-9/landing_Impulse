@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { publicUrl } from "@/lib/paths";
 
 /** Keeps the Supabase session fresh and sends signed-out visitors to /login. */
 export async function proxy(request: NextRequest) {
@@ -7,11 +8,12 @@ export async function proxy(request: NextRequest) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
   if (!url || !key) return NextResponse.next(); // accounts not configured yet: open mode
 
+  // Paths here come without the /editor base path. Redirects use the public address: behind the
+  // Cloudflare proxy, request.nextUrl carries the internal Render host.
+
   // A sign-in link that landed on the home page (Supabase "Site URL" fallback): finish it in /auth/callback.
   if (request.nextUrl.pathname === "/" && (request.nextUrl.searchParams.has("code") || request.nextUrl.searchParams.has("token_hash"))) {
-    const cb = request.nextUrl.clone();
-    cb.pathname = "/auth/callback";
-    return NextResponse.redirect(cb);
+    return NextResponse.redirect(publicUrl(`/auth/callback${request.nextUrl.search}`));
   }
 
   let response = NextResponse.next({ request });
@@ -30,12 +32,10 @@ export async function proxy(request: NextRequest) {
   } = await sb.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const protectedPage = ["/editor", "/cuenta", "/admin"].some((p) => path === p || path.startsWith(`${p}/`));
+  // "/" is the editor itself; "/editor" is its old address (redirects to "/")
+  const protectedPage = path === "/" || ["/editor", "/cuenta", "/admin"].some((p) => path === p || path.startsWith(`${p}/`));
   if (!user && protectedPage) {
-    const login = request.nextUrl.clone();
-    login.pathname = "/login";
-    login.search = `?next=${encodeURIComponent(path)}`;
-    return NextResponse.redirect(login);
+    return NextResponse.redirect(publicUrl(`/login?next=${encodeURIComponent(path)}`));
   }
   return response;
 }

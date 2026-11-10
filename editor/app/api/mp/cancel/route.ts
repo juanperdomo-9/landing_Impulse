@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { getAccount } from "@/lib/account";
 import { cancelPreapproval, saveSubscription } from "@/lib/mercadopago";
+import { publicUrl } from "@/lib/paths";
 import { supabaseAdmin } from "@/lib/supabase/server";
 
 /** "Botón de baja": cancels the signed-in user's Mercado Pago subscription right away. */
-export async function POST(req: Request) {
+export async function POST() {
   const account = await getAccount();
-  if (!account) return NextResponse.redirect(new URL("/login?next=/cuenta", req.url), 303);
+  if (!account) return NextResponse.redirect(publicUrl("/login?next=/cuenta"), 303);
 
-  const back = new URL("/cuenta", req.url);
+  const back = new URL(publicUrl("/cuenta"));
   try {
     const { data, error } = await supabaseAdmin()
       .from("subscriptions")

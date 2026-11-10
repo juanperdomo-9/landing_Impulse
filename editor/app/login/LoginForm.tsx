@@ -1,5 +1,6 @@
 "use client";
 
+import { withBase } from "@/lib/paths";
 import { useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
@@ -20,7 +21,7 @@ export default function LoginForm({ next, linkError }: { next: string; linkError
       email: email.trim(),
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+        emailRedirectTo: `${window.location.origin}${withBase("/auth/callback")}?next=${encodeURIComponent(next)}`,
       },
     });
     setBusy(false);
@@ -49,7 +50,7 @@ export default function LoginForm({ next, linkError }: { next: string; linkError
       setError(`El código no es correcto o ya venció. Revisa el mail o pide uno nuevo. (Detalle: ${error.message})`);
       return;
     }
-    window.location.href = next;
+    window.location.href = withBase(next);
   };
 
   if (step === "email")

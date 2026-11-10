@@ -1,5 +1,6 @@
 "use client";
 
+import { withBase } from "@/lib/paths";
 import { useState } from "react";
 import { uid } from "@/lib/project";
 import { analyzeVideo, chatSend, saveReferences } from "@/lib/references";
@@ -31,7 +32,7 @@ export default function ReferencesPanel() {
       setProgress("Mirando el video…");
       const a = await analyzeVideo(file, (p) => setProgress(`Mirando el video… ${Math.round(p * 100)}%`));
       setProgress("La IA está analizando el estilo…");
-      const res = await fetch("/api/reference", {
+      const res = await fetch(withBase("/api/reference"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

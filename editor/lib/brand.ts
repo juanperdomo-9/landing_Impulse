@@ -1,5 +1,6 @@
 "use client";
 
+import { withBase } from "@/lib/paths";
 import { addFiles } from "./media";
 import { totalDuration, uid } from "./project";
 import { store } from "./store";
@@ -71,7 +72,7 @@ const LS_KEY = "impulsa-brand";
 
 export async function loadBrand(): Promise<BrandKit | null> {
   try {
-    const res = await fetch("/api/brand");
+    const res = await fetch(withBase("/api/brand"));
     if (res.ok) {
       const { brand } = await res.json();
       if (brand) return { ...emptyBrand(), ...brand };
@@ -95,7 +96,7 @@ export async function saveBrand(brand: BrandKit): Promise<"cuenta" | "navegador"
     /* storage full or blocked */
   }
   try {
-    const res = await fetch("/api/brand", {
+    const res = await fetch(withBase("/api/brand"), {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ brand }),
