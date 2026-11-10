@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editor de video con IA | Impulsa Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Subí tu video en crudo y decile a la IA lo que querés: subtítulos automáticos, cortes de silencios, tu marca y el texto para publicar. Probalo gratis 3 días, sin tarjeta.">
+    <meta name="theme-color" content="#0A0F2C">
+    <link rel="canonical" href="https://impulsastudiodigital.com.ar/editor-ia/">
+
+    <!-- Vista previa al compartir el link (WhatsApp, Facebook, LinkedIn, X) -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_AR">
+    <meta property="og:site_name" content="Impulsa Studio">
+    <meta property="og:title" content="Editor de video con IA | Impulsa Studio">
+    <meta property="og:description" content="Editá tus videos hablando. Subtítulos, cortes, tu marca y el texto para publicar. Probalo gratis 3 días.">
+    <meta property="og:url" content="https://impulsastudiodigital.com.ar/editor-ia/">
+    <meta property="og:image" content="https://impulsastudiodigital.com.ar{% static 'img/og-editor.png' %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Editor de video con IA de Impulsa Studio: editá tus videos hablando.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Editor de video con IA | Impulsa Studio">
+    <meta name="twitter:description" content="Editá tus videos hablando. Probalo gratis 3 días.">
+    <meta name="twitter:image" content="https://impulsastudiodigital.com.ar{% static 'img/og-editor.png' %}">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A0F2C'/%3E%3Crect x='14' y='34' width='8' height='16' rx='2' fill='%23E8456F'/%3E%3Crect x='27' y='26' width='8' height='24' rx='2' fill='%23FF7A1A'/%3E%3Crect x='40' y='16' width='8' height='34' rx='2' fill='%23FFC93C'/%3E%3C/svg%3E">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>document.documentElement.classList.add('js');</script>
+
+    {% include 'partials/impulsa_styles.html' %}
+
+<style>
+    /* ---------- ESTILOS PROPIOS DE /editor-ia/ ---------- */
+    .eh-hero {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 48px;
+        align-items: center;
+        padding-top: 48px;
+        padding-bottom: 120px;
+    }
+
+    .eh-copy { position: relative; z-index: 1; flex: 1 1 480px; min-width: 0; }
+
+    .eh-title {
+        font-size: clamp(52px, 7.6vw, 116px);
+        line-height: .95;
+        letter-spacing: -0.04em;
+        margin: 0 0 28px;
+    }
+
+    .eh-lead {
+        max-width: 540px;
+        margin: 0 0 36px;
+        font-size: 20px;
+        line-height: 1.6;
+        color: var(--muted);
+    }
+
+    .eh-hero .editor-visual { z-index: 1; flex: 1 1 380px; }
+    .eh-hero .phone { width: min(320px, 80%); }
+
+    .eh-ctas { display: flex; flex-wrap: wrap; gap: 14px; }
+
+    .header-cta-sm { min-height: 44px; padding: 0 20px; font-size: 15px; }
+
+    .features { padding-top: 140px; padding-bottom: 80px; }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+        gap: 20px;
+    }
+
+    .feat {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 32px;
+        border-radius: 24px;
+        background: var(--card);
+        border: 1px solid rgba(255, 255, 255, .08);
+        transition: transform .5s var(--ease), border-color .4s ease, box-shadow .5s var(--ease);
+    }
+
+    .feat:hover {
+        transform: translateY(-6px);
+        border-color: rgba(255, 201, 60, .45);
+        box-shadow: 0 20px 50px rgba(232, 69, 111, .18);
+    }
+
+    .feat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .feat h3 {
+        margin: 0;
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 24px;
+        letter-spacing: -0.02em;
+    }
+
+    .feat p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); }
+
+    .privacy {
+        position: relative;
+        overflow: hidden;
+        margin-top: 60px;
+        padding: 120px 0;
+        background: var(--bg-2);
+    }
+
+    .privacy-inner { display: flex; flex-wrap: wrap; gap: 48px; align-items: center; }
+    .privacy-inner h2 { flex: 1 1 520px; font-size: clamp(40px, 5vw, 72px); line-height: .98; }
+    .privacy-inner p { flex: 1 1 360px; margin: 0; font-size: 18px; line-height: 1.7; color: var(--muted); }
+
+    .pricing { padding-top: 140px; padding-bottom: 60px; text-align: center; }
+    .pricing h2 { font-size: clamp(40px, 5vw, 72px); margin-bottom: 16px; }
+    .pricing > p { margin: 0 auto 56px; max-width: 520px; font-size: 18px; color: var(--muted); }
+
+    .plan {
+        position: relative;
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 44px 40px;
+        text-align: left;
+        border-radius: 32px;
+        background: var(--card);
+        border: 1px solid rgba(255, 201, 60, .35);
+        box-shadow: 0 40px 100px rgba(0, 0, 0, .4);
+    }
+
+    .plan::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 40px;
+        right: 40px;
+        height: 3px;
+        border-radius: 0 0 3px 3px;
+        background: var(--brand-gradient);
+    }
+
+    .plan-name { margin: 0 0 8px; font-size: 14px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--sun); }
+    .plan-price { margin: 0 0 28px; font-family: var(--display); font-weight: 800; font-size: 64px; letter-spacing: -0.04em; line-height: 1; }
+    .plan-price span { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 18px; letter-spacing: 0; color: var(--muted); }
+    .plan .checks { margin-bottom: 32px; }
+    .plan .btn { width: 100%; }
+    .plan-note { margin: 14px 0 0; text-align: center; font-size: 14px; color: var(--dim); }
+
+    .faq { max-width: 860px; padding-top: 120px; padding-bottom: 60px; }
+    .faq h2 { font-size: clamp(38px, 4.6vw, 64px); margin-bottom: 40px; }
+
+    .faq details {
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .faq summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        min-height: 72px;
+        cursor: pointer;
+        list-style: none;
+        font-family: var(--display);
+        font-weight: 700;
+        font-size: 21px;
+        transition: color .3s ease;
+    }
+
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary:hover { color: var(--sun); }
+
+    .faq-icon {
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, .18);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform .45s var(--ease), background-color .3s ease, border-color .3s ease;
+    }
+
+    .faq details[open] .faq-icon {
+        transform: rotate(45deg);
+        background: var(--sun);
+        border-color: var(--sun);
+        color: var(--bg);
+    }
+
+    .faq details p {
+        margin: 0 0 24px;
+        max-width: 680px;
+        font-size: 17px;
+        line-height: 1.7;
+        color: var(--muted);
+    }
+
+    .cross {
+        position: relative;
+        overflow: hidden;
+        margin-top: 80px;
+        padding: 140px 0;
+        text-align: center;
+        background: var(--bg-2);
+    }
+
+    .cross h2 { max-width: 900px; margin: 0 auto 24px; font-size: clamp(46px, 6.4vw, 100px); line-height: .95; letter-spacing: -0.04em; }
+    .cross > .container > p { max-width: 560px; margin: 0 auto 44px; font-size: 20px; line-height: 1.6; color: var(--muted-2); }
+    .cross .eh-ctas { justify-content: center; }
+
+    .simple-footer .footer-bottom { border-top: 0; padding-top: 0; }
+
+    @media (max-width: 760px) {
+        .eh-hero { padding-top: 24px; padding-bottom: 80px; }
+        .features { padding-top: 90px; }
+        .privacy, .cross { padding: 90px 0; }
+        .pricing { padding-top: 90px; }
+        .plan { padding: 36px 24px; }
+        .faq { padding-top: 90px; }
+        .faq summary { font-size: 18px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- NAVBAR -->
+<header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+        <a href="{% url 'home' %}" class="logo-chip" aria-label="Impulsa Studio, ir al inicio">
+            <img src="{% static 'img/horizontal.jpeg' %}" alt="Impulsa Studio">
+        </a>
+
+        <nav class="nav" aria-label="Secciones">
+            <ul class="nav-list">
+                <li><a class="nav-link" href="#como" data-spy="como">Cómo funciona</a></li>
+                <li><a class="nav-link" href="#funciones" data-spy="funciones">Funciones</a></li>
+                <li><a class="nav-link" href="#precio" data-spy="precio">Precio</a></li>
+                <li><a class="nav-link" href="#preguntas" data-spy="preguntas">Preguntas</a></li>
+            </ul>
+        </nav>
+
+        <a href="{{ editor_url }}" class="btn btn-accent header-cta-sm" target="_blank" rel="noopener">Probar gratis</a>
+    </div>
+</header>
+
+<div class="page">
+
+<!-- HERO -->
+<section class="container eh-hero" id="top">
+    <div class="orb orb-1" aria-hidden="true"></div>
+    <div class="orb orb-2" aria-hidden="true"></div>
+
+    <div class="eh-copy">
+        <span class="badge-new fu">
+            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="currentColor"/></svg>
+            Editor de video con IA
+        </span>
+        <h1 class="display eh-title">
+            <span class="w" style="animation-delay: .15s;">Editá</span>
+            <span class="w" style="animation-delay: .25s;">tus</span>
+            <span class="w" style="animation-delay: .35s;">videos</span>
+            <span class="w" style="animation-delay: .5s;"><em class="grad">hablando.</em></span>
+        </h1>
+        <p class="eh-lead fu" style="animation-delay: .75s;">
+            Subís tu video en crudo, le decís a la IA lo que querés y lo edita por vos: subtítulos, cortes, tu marca, música y efectos. Listo para Reels, TikTok y Shorts.
+        </p>
+        <div class="eh-ctas fu" style="animation-delay: .9s;">
+            <a href="{{ editor_url }}" class="btn btn-accent shiny breathe" target="_blank" rel="noopener">
+                Probalo gratis 3 días
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#como" class="btn btn-ghost">Ver cómo funciona</a>
+        </div>
+        <p class="editor-note fu" style="animation-delay: 1s;">Sin tarjeta para empezar. Tus videos se procesan en tu navegador.</p>
+    </div>
+
+    <div class="editor-visual reveal" aria-hidden="true">
+        {% include 'partials/editor_mockup.html' %}
+    </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+    <div class="track">
+        <span>Subtítulos automáticos</span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#0A0F2C"/></svg>
+        <span>Cortes de silencios</span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#0A0F2C"/></svg>
+        <span>Tu kit de marca</span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#0A0F2C"/></svg>
+        <span>Música y efectos</span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#0A0F2C"/></svg>
+        <span>Subtítulos automáticos</span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#0A0F2C"/></svg>
+        <span>Cortes de silencios</span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#0A0F2C"/></svg>
+        <span>Tu kit de marca</span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#0A0F2C"/></svg>
+        <span>Música y efectos</span><svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 0l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#0A0F2C"/></svg>
+    </div>
+</div>
+
+<!-- CÓMO FUNCIONA -->
+<section id="como" class="process" style="margin-top: 140px;">
+    <div class="container">
+        <h2 class="display reveal">Así de simple</h2>
+        <div class="steps">
+            <div class="rail" aria-hidden="true"></div>
+            <div class="step-item reveal">
+                <span class="step" style="background: #7A35C9; color: #fff;">1</span>
+                <h3>Subí tu video</h3>
+                <p>El video en crudo, tal cual lo grabaste con el celular.</p>
+            </div>
+            <div class="step-item reveal">
+                <span class="step" style="background: #E8456F; color: #fff; animation-delay: .7s;">2</span>
+                <h3>Pedile lo que querés</h3>
+                <p>"Hacelo vertical, sacá los silencios y poné subtítulos amarillos". La IA lo hace.</p>
+            </div>
+            <div class="step-item reveal">
+                <span class="step" style="background: #FFC93C; color: #0A0F2C; animation-delay: 1.4s;">3</span>
+                <h3>Ajustá y exportá</h3>
+                <p>Retocá lo que quieras a mano y descargalo en vertical, cuadrado u horizontal.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FUNCIONES -->
+<section id="funciones" class="container features">
+    <div class="section-head reveal">
+        <h2 class="display">Todo lo que tu video necesita</h2>
+        <p>Lo que antes te llevaba horas en un editor, ahora se lo pedís en una frase.</p>
+    </div>
+    <div class="features-grid">
+        <div class="feat reveal">
+            <span class="feat-icon" style="background: rgba(255, 201, 60, .16);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 15h4M13 15h4M7 11h10"/></svg></span>
+            <h3>Subtítulos automáticos</h3>
+            <p>Transcripción con IA y estilos animados palabra por palabra: TikTok, clásico, karaoke, minimal o neón.</p>
+        </div>
+        <div class="feat reveal">
+            <span class="feat-icon" style="background: rgba(232, 69, 111, .18);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF8FAE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.1 15.9M14.5 14.5L20 20M8.1 8.1L12 12"/></svg></span>
+            <h3>Cortes inteligentes</h3>
+            <p>Saca silencios y pausas, recorta tramos o se queda con los mejores momentos de tu video.</p>
+        </div>
+        <div class="feat reveal">
+            <span class="feat-icon" style="background: rgba(122, 53, 201, .26);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C89BFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r="2"/><circle cx="17.5" cy="10.5" r="2"/><circle cx="8.5" cy="7.5" r="2"/><circle cx="6.5" cy="12.5" r="2"/><path d="M12 2a10 10 0 0 0 0 20c1.7 0 2-1.3 1.2-2.3-.8-1-.4-2.7 1.3-2.7H17a5 5 0 0 0 5-5c0-5.5-4.5-10-10-10z"/></svg></span>
+            <h3>Tu kit de marca</h3>
+            <p>Logo, colores, tipografía, WhatsApp e Instagram. Se aplican al video con un botón.</p>
+        </div>
+        <div class="feat reveal">
+            <span class="feat-icon" style="background: rgba(255, 122, 26, .18);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF9A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M10 9l5 3-5 3z"/></svg></span>
+            <h3>Copiá un estilo que te guste</h3>
+            <p>Subí un Reel que te encante como referencia y la IA edita tu video imitando ese estilo.</p>
+        </div>
+        <div class="feat reveal">
+            <span class="feat-icon" style="background: rgba(255, 201, 60, .16);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 10-10a2 2 0 0 0-3-3L5 16l-1 4z"/></svg></span>
+            <h3>El texto para publicar</h3>
+            <p>Escribe la descripción del posteo para Instagram, TikTok, Facebook o estados de WhatsApp, con el tono de tu marca.</p>
+        </div>
+        <div class="feat reveal">
+            <span class="feat-icon" style="background: rgba(232, 69, 111, .18);"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF8FAE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+            <h3>Música, sonidos y efectos</h3>
+            <p>Música de fondo, efectos de sonido sin derechos y efectos visuales como zoom, flash o vintage.</p>
+        </div>
+    </div>
+</section>
+
+<!-- PRIVACIDAD -->
+<section class="privacy">
+    <div class="orb" aria-hidden="true" style="width: 520px; height: 520px; right: -180px; top: -140px; background: rgba(122, 53, 201, .3);"></div>
+    <div class="container privacy-inner">
+        <h2 class="display reveal">Tus videos no se suben a <em class="grad">ningún servidor.</em></h2>
+        <p class="reveal">El editor, los cortes y los subtítulos funcionan dentro de tu navegador. A la IA solo le llega el texto de tu pedido y algunas miniaturas para entender el video.</p>
+    </div>
+</section>
+
+<!-- PRECIO -->
+<section id="precio" class="container pricing">
+    <h2 class="display reveal">Un solo plan, todo incluido</h2>
+    <p class="reveal">Empezá con 3 días gratis, sin tarjeta. Si te sirve, seguís con el plan mensual.</p>
+    <div class="plan reveal">
+        <p class="plan-name">Plan mensual</p>
+        <p class="plan-price">{{ editor_price }} <span>/ mes</span></p>
+        <ul class="checks">
+            <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Editor completo: cortes, textos, fotos, música y efectos</li>
+            <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Subtítulos automáticos</li>
+            <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>{{ editor_ai_credits }} pedidos a la IA por mes</li>
+            <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Exportá en vertical, cuadrado u horizontal</li>
+            <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC93C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Cancelás cuando quieras desde Mercado Pago</li>
+        </ul>
+        <a href="{{ editor_url }}" class="btn btn-accent shiny" target="_blank" rel="noopener">
+            Empezar prueba gratis de 3 días
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <p class="plan-note">Sin tarjeta para empezar.</p>
+    </div>
+</section>
+
+<!-- PREGUNTAS -->
+<section id="preguntas" class="container faq">
+    <h2 class="display reveal">Preguntas frecuentes</h2>
+    <div class="reveal">
+        <details>
+            <summary>¿Necesito saber editar videos?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+            <p>No. Le escribís a la IA lo que querés, como si se lo pidieras a una persona, y ella hace la edición. Después podés retocar cualquier detalle a mano.</p>
+        </details>
+        <details>
+            <summary>¿Mis videos se suben a internet?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+            <p>No. Todo el procesamiento ocurre en tu navegador. A la IA solo le llega el texto de tu pedido, un resumen del proyecto y algunas miniaturas.</p>
+        </details>
+        <details>
+            <summary>¿Desde qué dispositivo lo uso?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+            <p>Funciona mejor en una computadora con Chrome o Edge. Mientras se exporta el video, dejá la pestaña abierta.</p>
+        </details>
+        <details>
+            <summary>¿Qué pasa cuando termina la prueba?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+            <p>Si te gustó, te suscribís al plan mensual desde tu cuenta. Como la prueba no pide tarjeta, no se te cobra nada si decidís no seguir.</p>
+        </details>
+        <details>
+            <summary>¿Puedo cancelar cuando quiera?<span class="faq-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+            <p>Sí. La suscripción se maneja con Mercado Pago y la podés cancelar cuando quieras.</p>
+        </details>
+    </div>
+</section>
+
+<!-- CIERRE + AGENCIA -->
+<section class="cross">
+    <div class="orb" aria-hidden="true" style="width: 560px; height: 560px; left: -200px; bottom: -220px; background: rgba(255, 122, 26, .2);"></div>
+    <div class="container" style="position: relative;">
+        <p class="eyebrow-text reveal">Empezá hoy</p>
+        <h2 class="display reveal">Tu próximo video, <em class="grad">en una frase.</em></h2>
+        <p class="reveal">Probalo gratis 3 días. Y si preferís que el contenido lo hagamos nosotros, el equipo de Impulsa también se encarga.</p>
+        <div class="eh-ctas reveal">
+            <a href="{{ editor_url }}" class="btn btn-accent btn-lg shiny breathe" target="_blank" rel="noopener">
+                Probalo gratis 3 días
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="{% url 'home' %}#charla" class="btn btn-ghost btn-lg">Prefiero que lo hagan ustedes</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer simple-footer" style="padding-top: 56px;">
+    <div class="container footer-bottom">
+        <a href="{% url 'home' %}" class="logo-chip" aria-label="Impulsa Studio, ir al inicio">
+            <img src="{% static 'img/horizontal.jpeg' %}" alt="Impulsa Studio">
+        </a>
+        <p>© {% now "Y" %} Impulsa Studio — Marketing Digital</p>
+        <a href="https://wa.me/{{ whatsapp_number }}?text=Hola%20Impulsa%2C%20tengo%20una%20consulta%20sobre%20el%20editor%20de%20video" class="footer-link" target="_blank" rel="noopener">WhatsApp {{ whatsapp_display }}</a>
+    </div>
+</footer>
+
+</div>
+
+<script>
+(() => {
+    // --- Navbar al scrollear + barra de progreso ---
+    const header = document.getElementById('siteHeader');
+    const progress = document.getElementById('progress');
+    let ticking = false;
+
+    function onScroll() {
+        const y = window.scrollY;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        header.classList.toggle('is-scrolled', y > 20);
+        progress.style.transform = 'scaleX(' + (max > 0 ? y / max : 0) + ')';
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(onScroll);
+            ticking = true;
+        }
+    }, { passive: true });
+    onScroll();
+
+    // --- Aparición al scrollear y sección activa ---
+    const revealEls = document.querySelectorAll('.reveal, .rail');
+    if (!('IntersectionObserver' in window)) {
+        revealEls.forEach(el => el.classList.add('in'));
+        return;
+    }
+
+    const revealObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    const spyLinks = document.querySelectorAll('[data-spy]');
+    const spyObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                spyLinks.forEach(link => link.classList.toggle('is-active', link.dataset.spy === entry.target.id));
+            }
+        });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    ['top', 'como', 'funciones', 'precio', 'preguntas'].forEach(id => {
+        const section = document.getElementById(id);
+        if (section) spyObserver.observe(section);
+    });
+})();
+</script>
+</body>
+</html>
