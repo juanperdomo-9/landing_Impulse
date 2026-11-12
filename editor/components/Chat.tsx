@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type Anthropic from "@anthropic-ai/sdk";
 import { describeProject } from "@/lib/actions";
-import { executeTool } from "@/lib/aiExecutor";
+import { executeTool, framesForAI, storyboardTimes } from "@/lib/aiExecutor";
 import { imageThumb } from "@/lib/media";
 import { getPlayer } from "@/lib/player";
 import { store, useEditor } from "@/lib/store";
@@ -45,15 +45,23 @@ const TOOL_LABELS: Record<string, string> = {
   set_format: "Cambiando formato",
   set_video_volume: "Ajustando volumen",
   apply_brand: "Aplicando tu marca",
+  view_frames: "Mirando el video",
+  update_item: "Ajustando un elemento",
+  delete_items: "Quitando elementos",
+  undo: "Deshaciendo cambios",
   clear: "Limpiando elementos",
 };
 
-const MAX_STEPS = 12;
+const MAX_STEPS = 14;
+// request size budget (the server accepts up to ~8 MB; this keeps requests fast and cheap)
+const MAX_BYTES = 3_200_000;
 
 /** Instructions (with their tool steps) kept in what is sent to the AI. */
 const KEEP_INSTRUCTIONS = 8;
-/** Instructions whose images (current frame, uploaded photos) are still sent. */
-const KEEP_IMAGES_FOR = 2;
+/** Instructions whose images (video storyboard, uploaded photos) are still sent: older storyboards are out of date. */
+const KEEP_IMAGES_FOR = 1;
+/** Most images sent in one request (newest first); the server rejects more than 60. */
+const MAX_SENT_IMAGES = 50;
 /** New uploaded photos shown to the AI per instruction. */
 const MAX_NEW_IMAGES = 6;
 /** Tool results of earlier instructions are trimmed to this many characters. */
@@ -73,7 +81,7 @@ function compactHistory(history: Msg[]): Msg[] {
   const keepImagesFrom = starts.length > KEEP_IMAGES_FOR ? starts[starts.length - KEEP_IMAGES_FOR] : 0;
   const latest = starts[starts.length - 1] ?? 0;
 
-  return history.slice(from).map((m, k) => {
+  const compacted = history.slice(from).map((m, k) => {
     const i = from + k;
     if (m.role !== "user" || !Array.isArray(m.content)) return m;
     if (!isInstruction(m)) {
@@ -94,6 +102,33 @@ function compactHistory(history: Msg[]): Msg[] {
     });
     return { ...m, content };
   });
+
+  return capImages(compacted);
+}
+
+const IMAGE_OMITTED = { type: "text" as const, text: "[imagen anterior omitida]" };
+
+/** Keeps only the newest MAX_SENT_IMAGES images (storyboard, photos and frames the AI asked to see). */
+function capImages(history: Msg[]): Msg[] {
+  let left = MAX_SENT_IMAGES;
+  const out: Msg[] = [];
+  for (let i = history.length - 1; i >= 0; i--) {
+    const m = history[i];
+    if (m.role !== "user" || !Array.isArray(m.content)) {
+      out.unshift(m);
+      continue;
+    }
+    const content = [...m.content].reverse().map((b) => {
+      if (b.type === "image") return left-- > 0 ? b : IMAGE_OMITTED;
+      if (b.type === "tool_result" && Array.isArray(b.content)) {
+        const inner = [...b.content].reverse().map((c) => (c.type === "image" ? (left-- > 0 ? c : IMAGE_OMITTED) : c));
+        return { ...b, content: inner.reverse() };
+      }
+      return b;
+    });
+    out.unshift({ ...m, content: content.reverse() } as Msg);
+  }
+  return out;
 }
 
 export default function Chat({ usage: initialUsage }: { usage?: { used: number; limit: number } }) {
@@ -156,15 +191,29 @@ export default function Chat({ usage: initialUsage }: { usage?: { used: number; 
           /* ignore unreadable image */
         }
       }
-      const player = getPlayer();
-      if (player && store.get().project.clips.length) {
-        content.push({ type: "text", text: "Fotograma actual del video:" });
-        content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: player.snapshot() } });
+      // storyboard: frames across the whole edited video so the AI knows what it contains
+      if (store.get().project.clips.length) {
+        try {
+          const frames = await framesForAI(storyboardTimes(), 320);
+          content.push({ type: "text", text: "Tira de fotogramas del video editado (segundos de la línea de tiempo):" });
+          content.push(...frames);
+        } catch {
+          /* continue without frames */
+        }
       }
       content.push({ type: "text", text });
+      // keep requests under the hosting limit: when the conversation gets heavy (many images),
+      // start a fresh one. Every instruction carries the full project state, so nothing is lost.
+      if (history.current.length && JSON.stringify(history.current).length + JSON.stringify(content).length > MAX_BYTES) {
+        history.current = [];
+      }
       history.current.push({ role: "user", content });
 
       for (let step = 0; step < MAX_STEPS; step++) {
+        if (JSON.stringify(compactHistory(history.current)).length > MAX_BYTES + 600_000) {
+          push({ role: "error", text: "La instrucción se hizo demasiado larga. Pedila de nuevo en partes más chicas." });
+          break;
+        }
         const res = await fetch(withBase("/api/assistant"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -210,7 +259,7 @@ export default function Chat({ usage: initialUsage }: { usage?: { used: number; 
   }
 
   return (
-    <aside className="flex w-[360px] shrink-0 flex-col border-l border-[var(--line)] bg-[var(--panel)]">
+    <aside className="flex h-full w-full shrink-0 flex-col bg-[var(--panel)] md:h-auto md:w-[360px] md:border-l md:border-[var(--line)]">
       <div className="flex h-11 shrink-0 items-center gap-2 border-b border-[var(--line)] px-4">
         <span className="brand-mark h-7 w-7">
           <IconBrandBars size={15} />
@@ -253,9 +302,13 @@ export default function Chat({ usage: initialUsage }: { usage?: { used: number; 
         <div ref={endRef} />
       </div>
       {hasVideo && items.length < 3 && (
-        <div className="flex flex-wrap gap-1.5 px-3 pb-2">
+        <div className="scroll-thin flex shrink-0 gap-1.5 overflow-x-auto px-3 pb-2 md:flex-wrap md:overflow-visible">
           {SUGGESTIONS.map((s) => (
-            <button key={s} className="rounded-full border border-[var(--line)] px-2.5 py-1 text-left text-[11px] text-[var(--muted)] hover:border-[var(--accent)] hover:text-white" onClick={() => send(s)}>
+            <button
+              key={s}
+              className="shrink-0 rounded-full border border-[var(--line)] px-2.5 py-1 text-left text-[11px] whitespace-nowrap text-[var(--muted)] hover:border-[var(--accent)] hover:text-white md:shrink md:whitespace-normal"
+              onClick={() => send(s)}
+            >
               {s}
             </button>
           ))}

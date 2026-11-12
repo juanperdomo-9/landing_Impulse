@@ -32,14 +32,14 @@ export async function proxy(request: NextRequest) {
   } = await sb.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  // "/" is the editor itself; "/editor" is its old address (redirects to "/")
-  const protectedPage = path === "/" || ["/editor", "/cuenta", "/admin"].some((p) => path === p || path.startsWith(`${p}/`));
+  // "/" is the editor itself (a saved project opens with ?p=); "/editor" is its old address (redirects to "/")
+  const protectedPage = path === "/" || ["/editor", "/cuenta", "/admin", "/proyectos"].some((p) => path === p || path.startsWith(`${p}/`));
   if (!user && protectedPage) {
-    return NextResponse.redirect(publicUrl(`/login?next=${encodeURIComponent(path)}`));
+    return NextResponse.redirect(publicUrl(`/login?next=${encodeURIComponent(path + request.nextUrl.search)}`));
   }
   return response;
 }
 
 export const config = {
-  matcher: ["/", "/editor/:path*", "/cuenta/:path*", "/admin/:path*", "/login"],
+  matcher: ["/", "/editor/:path*", "/cuenta/:path*", "/admin/:path*", "/proyectos/:path*", "/login"],
 };

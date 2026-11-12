@@ -134,7 +134,7 @@ export async function ensureLogoAsset(brand: BrandKit): Promise<string | null> {
   const existing = store.get().assets.find((a) => a.name === LOGO_ASSET_NAME);
   if (existing) return existing.id;
   const blob = await (await fetch(brand.logo)).blob();
-  await addFiles([new File([blob], LOGO_ASSET_NAME, { type: "image/png" })]);
+  await addFiles([new File([blob], LOGO_ASSET_NAME, { type: "image/png" })], { autoPlace: false });
   return store.get().assets.find((a) => a.name === LOGO_ASSET_NAME)?.id ?? null;
 }
 

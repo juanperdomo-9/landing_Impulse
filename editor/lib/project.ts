@@ -290,26 +290,58 @@ export function segmentsToWords(segs: Segment[]): Word[] {
 }
 
 /** Build subtitle cues on the timeline from the transcripts of the clips' source videos. */
+export type SubSource = "video" | "music" | "all";
+
+export const musicItems = (p: Project) => p.audio.filter((a) => a.kind === "music" && a.assetId);
+
+/** Background song when the clips are muted (or there is no video), otherwise the voice of the clips. */
+export function defaultSubSource(p: Project): "video" | "music" {
+  const audible = p.clips.some((c) => c.volume > 0.05);
+  return !audible && musicItems(p).length ? "music" : "video";
+}
+
 export function buildCues(
   p: Project,
   transcripts: Record<string, Segment[]>,
   wordsPerCue: number,
+  source: SubSource = "video",
+  durations: Record<string, number> = {},
 ): Cue[] {
   const starts = clipStarts(p);
   const timelineWords: Word[] = [];
-  p.clips.forEach((c, i) => {
-    const segs = transcripts[c.assetId];
-    if (!segs) return;
-    for (const w of segmentsToWords(segs)) {
-      const mid = (w.start + w.end) / 2;
-      if (mid < c.in || mid >= c.out) continue;
-      timelineWords.push({
-        text: w.text,
-        start: starts[i] + Math.max(0, w.start - c.in),
-        end: starts[i] + Math.min(c.out - c.in, w.end - c.in),
-      });
+  if (source !== "music")
+    p.clips.forEach((c, i) => {
+      const segs = transcripts[c.assetId];
+      if (!segs) return;
+      for (const w of segmentsToWords(segs)) {
+        const mid = (w.start + w.end) / 2;
+        if (mid < c.in || mid >= c.out) continue;
+        timelineWords.push({
+          text: w.text,
+          start: starts[i] + Math.max(0, w.start - c.in),
+          end: starts[i] + Math.min(c.out - c.in, w.end - c.in),
+        });
+      }
+    });
+  if (source !== "video")
+    for (const m of musicItems(p)) {
+      const segs = transcripts[m.assetId!];
+      if (!segs?.length) continue;
+      const words = segmentsToWords(segs);
+      const length = durations[m.assetId!] || Math.max(...segs.map((x) => x.end));
+      const itemEnd = m.start + m.duration;
+      // a looping song repeats its lyrics
+      for (let k = 0; k < 50; k++) {
+        const base = m.start - m.offset + k * length;
+        if (base >= itemEnd || (!m.loop && k > 0)) break;
+        for (const w of words) {
+          const start = base + w.start;
+          if (start < m.start || start >= itemEnd) continue;
+          timelineWords.push({ text: w.text, start, end: Math.min(itemEnd, base + w.end) });
+        }
+      }
     }
-  });
+  timelineWords.sort((a, b) => a.start - b.start);
 
   const cues: Cue[] = [];
   let cur: Word[] = [];
@@ -371,4 +403,40 @@ export function positionToXY(pos: string): { x: number; y: number } {
     default:
       return { x: 0.5, y: 0.5 };
   }
+}
+
+export type SlotKind = "image" | "text" | "effect" | "sfx";
+
+/**
+ * Where the next item of a kind goes: right after the last item of that kind already in the video
+ * (or at the playhead when there are none). Logos that cover almost the whole video don't count.
+ * `full` is true when there was no room left and the item had to overlap another one.
+ */
+export function nextSlot(
+  p: Project,
+  kind: SlotKind,
+  playhead: number,
+  len = 3,
+): { start: number; end: number; full: boolean } {
+  const dur = totalDuration(p);
+  const ends =
+    kind === "effect"
+      ? p.effects.map((e) => e.end)
+      : kind === "sfx"
+        ? p.audio.filter((a) => a.kind === "sfx").map((a) => a.start + a.duration)
+        : p.overlays
+            .filter((o) => (kind === "image" ? o.kind === "image" : o.kind === "text"))
+            .filter((o) => !(dur > 0 && o.end - o.start >= dur * 0.9))
+            .map((o) => o.end);
+  let start = ends.length ? Math.max(...ends) : playhead;
+  if (dur <= 0) return { start, end: start + len, full: false };
+  if (start + Math.min(len, 1) > dur) {
+    start = Math.max(0, Math.min(playhead, dur - len));
+    return { start, end: Math.min(dur, start + len), full: true };
+  }
+  return { start, end: Math.min(dur, start + len), full: false };
+}
+
+export function nextPhotoSlot(p: Project, playhead: number, len = 3) {
+  return nextSlot(p, "image", playhead, len);
 }

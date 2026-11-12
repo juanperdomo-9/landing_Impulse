@@ -1,8 +1,9 @@
 "use client";
 
 import { withBase } from "@/lib/paths";
+import { idbPut, MEDIA, persistStorage } from "./idb";
 import { getPlayer } from "./player";
-import { uid } from "./project";
+import { fmt, nextPhotoSlot, totalDuration, uid } from "./project";
 import { store } from "./store";
 import type { Asset, AssetKind, Segment } from "./types";
 
@@ -17,11 +18,12 @@ function kindOf(file: File): AssetKind | null {
   return null;
 }
 
-export async function probeFile(file: File): Promise<Asset | null> {
-  const kind = kindOf(file);
+export async function probeFile(file: File, id?: string, forceKind?: AssetKind, name?: string): Promise<Asset | null> {
+  // forceKind "audio" lets a video file be used only for its sound
+  const kind = forceKind ?? kindOf(file);
   if (!kind) return null;
   const url = URL.createObjectURL(file);
-  const base = { id: uid(), kind, name: file.name, url, file, duration: 0 };
+  const base = { id: id ?? uid(), kind, name: name ?? file.name, url, file, duration: 0 };
   if (kind === "video" || kind === "audio") {
     const el = document.createElement(kind);
     el.preload = "metadata";
@@ -211,18 +213,34 @@ export async function transcribeAsset(
   }
 }
 
-/** Transcribe every video used on the timeline. */
-export async function transcribeTimeline(opts?: { language?: string | null; model?: string }) {
+/** Transcribe the audio used for subtitles: the voice of the clips and/or the background songs. */
+export async function transcribeTimeline(opts?: {
+  language?: string | null;
+  model?: string;
+  source?: "video" | "music" | "all";
+}) {
   const s = store.get();
-  const ids = Array.from(new Set(s.project.clips.map((c) => c.assetId)));
+  const source = opts?.source ?? "video";
+  const ids = new Set<string>();
+  if (source !== "music") s.project.clips.forEach((c) => ids.add(c.assetId));
+  if (source !== "video")
+    s.project.audio.forEach((a) => {
+      if (a.kind === "music" && a.assetId) ids.add(a.assetId);
+    });
   for (const id of ids) {
     const a = s.assets.find((x) => x.id === id);
     if (a) await transcribeAsset(a, opts);
   }
 }
 
-export async function addFiles(files: FileList | File[]) {
+/**
+ * Adds files to the project. Videos go to the end of the video track; photos are placed on the video
+ * at the playhead (3 s each, one after another); music goes under the whole video.
+ */
+export async function addFiles(files: FileList | File[], opts: { autoPlace?: boolean } = {}) {
+  const autoPlace = opts.autoPlace !== false;
   const player = getPlayer();
+  const placed: string[] = [];
   for (const f of Array.from(files)) {
     store.set({ busy: `Cargando ${f.name}…` });
     try {
@@ -230,6 +248,9 @@ export async function addFiles(files: FileList | File[]) {
       if (!a) continue;
       await player?.addAsset(a);
       store.set((s) => ({ assets: [...s.assets, a] }));
+      // keep the file on this device so the project can be reopened later
+      idbPut(MEDIA, a.id, f).catch(() => undefined);
+      persistStorage();
       if (a.kind === "video") {
         const first = store.get().project.clips.length === 0;
         store.edit((p) => ({
@@ -244,12 +265,52 @@ export async function addFiles(files: FileList | File[]) {
               : p.aspect,
           clips: [...p.clips, { id: uid(), assetId: a.id, in: 0, out: a.duration, volume: 1 }],
         }));
+      } else if (autoPlace && a.kind === "image") {
+        const slot = nextPhotoSlot(store.get().project, store.get().time);
+        store.edit((p) => ({
+          ...p,
+          overlays: [
+            ...p.overlays,
+            { id: uid(), kind: "image", assetId: a.id, start: slot.start, end: slot.end, x: 0.5, y: 0.5, size: 1, animation: "fade", fill: "cover" },
+          ],
+        }));
+        placed.push(`🖼 ${a.name}: ${fmt(slot.start)}–${fmt(slot.end)}${slot.full ? " (ya no quedaba lugar libre, se superpone)" : ""}`);
+      } else if (autoPlace && a.kind === "audio") {
+        const p = store.get().project;
+        const dur = totalDuration(p);
+        const hasMusic = p.audio.some((x) => x.kind === "music");
+        const start = hasMusic ? store.get().time : 0;
+        const length = dur > 0 ? Math.max(0.5, dur - start) : a.duration;
+        store.edit((pr) => ({
+          ...pr,
+          audio: [
+            ...pr.audio,
+            {
+              id: uid(),
+              kind: "music",
+              assetId: a.id,
+              name: a.name,
+              start,
+              duration: length,
+              offset: 0,
+              // quieter when the video has a voice track
+              volume: pr.clips.length ? 0.25 : 0.8,
+              fadeIn: 1,
+              fadeOut: 2,
+              loop: true,
+            },
+          ],
+        }));
+        placed.push(`♪ ${a.name}: de fondo desde ${fmt(start)}`);
       }
     } catch (e) {
       alert((e as Error).message);
     } finally {
       store.set({ busy: null });
     }
+  }
+  if (placed.length) {
+    store.set({ toast: `Agregado al video — ${placed.join(" · ")}. Podés moverlo en la línea de tiempo.` });
   }
 }
 
@@ -265,4 +326,54 @@ export async function imageThumb(asset: Asset, max = 384): Promise<string> {
   ctx.fillRect(0, 0, c.width, c.height);
   ctx.drawImage(img, 0, 0, c.width, c.height);
   return c.toDataURL("image/jpeg", 0.75).split(",")[1];
+}
+
+/**
+ * Uses the sound of a video (e.g. a saved Reel with a trending audio) as background music.
+ * `replace` mutes the original sound of the user's clips.
+ */
+export async function addVideoSound(file: File, opts: { replace: boolean }) {
+  const player = getPlayer();
+  store.set({ busy: `Extrayendo el sonido de ${file.name}…` });
+  try {
+    const a = await probeFile(file, undefined, "audio", `Sonido de ${file.name.replace(/\.[^.]+$/, "")}`);
+    if (!a) throw new Error("Ese archivo no es un video válido.");
+    try {
+      await player?.addAsset(a);
+    } catch {
+      throw new Error("No pudimos leer el sonido de ese video. Probá con otro archivo (MP4 o MOV).");
+    }
+    store.set((s) => ({ assets: [...s.assets, a] }));
+    idbPut(MEDIA, a.id, file).catch(() => undefined);
+    const dur = totalDuration(store.get().project);
+    store.edit((p) => ({
+      ...p,
+      clips: opts.replace ? p.clips.map((c) => ({ ...c, volume: 0 })) : p.clips,
+      audio: [
+        ...p.audio,
+        {
+          id: uid(),
+          kind: "music",
+          assetId: a.id,
+          name: a.name,
+          start: 0,
+          duration: dur > 0 ? dur : a.duration,
+          offset: 0,
+          volume: opts.replace ? 1 : 0.3,
+          fadeIn: opts.replace ? 0 : 1,
+          fadeOut: 1.5,
+          loop: true,
+        },
+      ],
+    }));
+    store.set({
+      toast: opts.replace
+        ? `Listo: ahora suena «${a.name}» y el sonido original de tu video quedó en silencio.`
+        : `Listo: «${a.name}» suena de fondo junto con el sonido de tu video.`,
+    });
+  } catch (e) {
+    alert((e as Error).message);
+  } finally {
+    store.set({ busy: null });
+  }
 }

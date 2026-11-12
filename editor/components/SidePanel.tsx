@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import * as A from "@/lib/actions";
-import { addFiles, WHISPER_MODELS, transcribeTimeline } from "@/lib/media";
-import { SUBTITLE_PRESETS, fmt } from "@/lib/project";
+import { addFiles, addVideoSound, WHISPER_MODELS } from "@/lib/media";
+import { SUBTITLE_PRESETS, fmt, nextPhotoSlot } from "@/lib/project";
 import { SFX_INFO, sfxBuffer } from "@/lib/sfx";
 import { store, useEditor } from "@/lib/store";
 import { EFFECT_LABELS, EFFECT_TYPES, SFX_NAMES, type SfxName, type SubtitlePreset } from "@/lib/types";
 import BrandPanel from "./BrandPanel";
+import ColorField from "./ColorField";
 import Field from "./Field";
 import PublishPanel from "./PublishPanel";
 import ReferencesPanel from "./ReferencesPanel";
@@ -37,7 +38,7 @@ const TABS = [
 ] as const;
 type Tab = (typeof TABS)[number]["id"];
 
-export default function SidePanel() {
+export default function SidePanel({ mobile = false }: { mobile?: boolean }) {
   const [tab, setTab] = useState<Tab>("media");
   const selection = useEditor((s) => s.selection);
   useEffect(() => {
@@ -45,13 +46,25 @@ export default function SidePanel() {
   }, [selection]);
 
   return (
-    <aside className="flex w-[340px] shrink-0 border-r border-[var(--line)] bg-[var(--panel)]">
-      <nav className="scroll-thin flex w-16 shrink-0 flex-col gap-1 overflow-y-auto border-r border-[var(--line)] p-1.5">
+    <aside
+      className={
+        mobile
+          ? "flex h-full w-full flex-col bg-[var(--panel)]"
+          : "flex w-[340px] shrink-0 border-r border-[var(--line)] bg-[var(--panel)]"
+      }
+    >
+      <nav
+        className={
+          mobile
+            ? "scroll-thin flex shrink-0 gap-1 overflow-x-auto border-b border-[var(--line)] p-1.5"
+            : "scroll-thin flex w-16 shrink-0 flex-col gap-1 overflow-y-auto border-r border-[var(--line)] p-1.5"
+        }
+      >
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`flex flex-col items-center gap-1 rounded-lg py-2 text-[10px] font-semibold transition-colors ${tab === t.id ? "bg-[var(--panel-2)] text-[var(--sun)]" : "text-[var(--muted)] hover:text-white"}`}
+            className={`flex shrink-0 flex-col items-center gap-1 rounded-lg py-2 text-[10px] font-semibold transition-colors ${mobile ? "min-w-[68px] px-1" : ""} ${tab === t.id ? "bg-[var(--panel-2)] text-[var(--sun)]" : "text-[var(--muted)] hover:text-white"}`}
             aria-current={tab === t.id ? "page" : undefined}
           >
             <t.icon size={18} />
@@ -59,7 +72,7 @@ export default function SidePanel() {
           </button>
         ))}
       </nav>
-      <div className="scroll-thin min-w-0 flex-1 overflow-y-auto p-3">
+      <div className={`scroll-thin min-w-0 flex-1 overflow-y-auto p-3 ${mobile ? "min-h-0 pb-6" : ""}`}>
         {tab === "media" && <MediaTab />}
         {tab === "subs" && <SubtitlesTab />}
         {tab === "text" && <TextTab />}
@@ -76,8 +89,18 @@ export default function SidePanel() {
 
 function MediaTab() {
   const assets = useEditor((s) => s.assets);
+  const [soundFor, setSoundFor] = useState<string | null>(null);
+  const fit = useEditor((s) => s.project.fit);
   return (
     <div className="space-y-3">
+      <label className="block space-y-1 md:hidden">
+        <span className="label block">Encuadre</span>
+        <select id="fit-mobile" className="input" value={fit} onChange={(e) => A.setFormat({ fit: e.target.value })}>
+          <option value="blur">Fondo desenfocado</option>
+          <option value="cover">Llenar (recortar)</option>
+          <option value="contain">Ajustar (bandas)</option>
+        </select>
+      </label>
       <label className="btn btn-primary w-full cursor-pointer justify-center">
         Subir videos, fotos o música
         <input
@@ -91,7 +114,12 @@ function MediaTab() {
           }}
         />
       </label>
-      {!assets.length && <p className="text-sm text-[var(--muted)]">Aún no hay archivos. Los videos se añaden automáticamente a la línea de tiempo.</p>}
+      {!assets.length && (
+        <p className="text-sm text-[var(--muted)]">
+          Aún no hay archivos. Todo lo que subas se agrega solo: los videos al final, las fotos donde está parado el video
+          y la música de fondo.
+        </p>
+      )}
       {assets.some((a) => a.kind === "video") && (
         <button
           className="btn w-full justify-center"
@@ -133,12 +161,46 @@ function MediaTab() {
                     ...p,
                     clips: [...p.clips, { id: Math.random().toString(36).slice(2), assetId: a.id, in: 0, out: a.duration, volume: 1 }],
                   }));
-                else if (a.kind === "image") A.addImage({ asset: a.id, start: t, end: t + 3 });
+                else if (a.kind === "image") {
+                  const slot = nextPhotoSlot(store.get().project, t);
+                  A.addImage({ asset: a.id, start: slot.start, end: slot.end, animation: "fade", fill: "cover" });
+                  store.set({ toast: `Foto agregada: ${fmt(slot.start)}–${fmt(slot.end)}${slot.full ? " (ya no quedaba lugar libre, se superpone)" : ""}` });
+                }
                 else A.addMusic({ asset: a.id, start: t });
               }}
             >
               + Añadir
             </button>
+            {a.kind === "video" &&
+              (soundFor === a.id ? (
+                <div className="mx-1.5 mb-1.5 flex flex-col gap-1">
+                  <button
+                    className="rounded bg-[#0f0f18] py-1 text-[11px] font-semibold hover:bg-[var(--accent)]"
+                    onClick={() => {
+                      addVideoSound(a.file, { replace: true });
+                      setSoundFor(null);
+                    }}
+                  >
+                    🔇 Reemplazar el sonido
+                  </button>
+                  <button
+                    className="rounded bg-[#0f0f18] py-1 text-[11px] font-semibold hover:bg-[var(--accent)]"
+                    onClick={() => {
+                      addVideoSound(a.file, { replace: false });
+                      setSoundFor(null);
+                    }}
+                  >
+                    🎚 Mezclar de fondo
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="mx-1.5 mb-1.5 w-[calc(100%-12px)] rounded bg-[#0f0f18] py-1 text-[11px] font-semibold hover:bg-[var(--accent)]"
+                  onClick={() => setSoundFor(a.id)}
+                >
+                  ♪ Usar su sonido
+                </button>
+              ))}
           </div>
         ))}
       </div>
@@ -153,13 +215,16 @@ function SubtitlesTab() {
   const busy = useEditor((s) => s.busy);
   const [lang, setLang] = useState("spanish");
   const [model, setModel] = useState<string>(WHISPER_MODELS.equilibrado);
+  const [source, setSource] = useState<"auto" | "video" | "music" | "all">("auto");
+  const hasSong = useEditor((s) => s.project.audio.some((a) => a.kind === "music" && !!a.assetId));
   const [err, setErr] = useState("");
 
   const generate = async () => {
     setErr("");
     try {
-      await transcribeTimeline({ language: lang || null, model });
-      await A.addSubtitles({ language: lang || null });
+      const src = source === "auto" ? undefined : source;
+      const n = await A.addSubtitles({ language: lang || null, model, source: src });
+      if (!n) setErr("No se escuchó voz ni letra para subtitular. Probá eligiendo otro audio o el modelo «Preciso».");
     } catch (e) {
       setErr((e as Error).message);
     }
@@ -184,7 +249,33 @@ function SubtitlesTab() {
             <option value={WHISPER_MODELS.preciso}>Preciso</option>
           </select>
         </div>
-        <button className="btn btn-primary w-full justify-center" disabled={!hasClips || !!busy} onClick={generate}>
+        {hasSong && (
+          <label className="block space-y-1">
+            <span className="label block">¿De qué audio?</span>
+            <select
+              id="sub-source"
+              className="input"
+              value={source}
+              onChange={(e) => {
+                const v = e.target.value as typeof source;
+                setSource(v);
+                if ((v === "music" || v === "all") && !A.isPhone()) setModel(WHISPER_MODELS.preciso);
+              }}
+            >
+              <option value="auto">Automático</option>
+              <option value="video">Voz del video</option>
+              <option value="music">Letra de la canción de fondo</option>
+              <option value="all">Ambos</option>
+            </select>
+            {(source === "music" || source === "all") && (
+              <span className="block text-[11px] text-[var(--muted)]">
+                Con música algunas palabras pueden salir mal: revisá la letra. En la compu conviene el modelo
+                «Preciso» (más pesado, la primera vez tarda unos minutos en descargarse).
+              </span>
+            )}
+          </label>
+        )}
+        <button className="btn btn-primary w-full justify-center" disabled={(!hasClips && !hasSong) || !!busy} onClick={generate}>
           Generar subtítulos
         </button>
         <p className="text-[11px] text-[var(--muted)]">
@@ -208,10 +299,10 @@ function SubtitlesTab() {
         </div>
         <div className="grid grid-cols-2 gap-2">
           <Field label="Color">
-            <input type="color" className="h-8 w-full" value={style.color} onChange={(e) => A.styleSubtitles({ color: e.target.value })} />
+            <ColorField id="sub-color" value={style.color} onChange={(c) => A.styleSubtitles({ color: c })} />
           </Field>
           <Field label="Resaltado">
-            <input type="color" className="h-8 w-full" value={style.highlight} onChange={(e) => A.styleSubtitles({ highlight: e.target.value })} />
+            <ColorField id="sub-highlight" value={style.highlight} onChange={(c) => A.styleSubtitles({ highlight: c })} />
           </Field>
           <Field label="Posición">
             <select className="input" value={style.position} onChange={(e) => A.styleSubtitles({ position: e.target.value as "top" })}>

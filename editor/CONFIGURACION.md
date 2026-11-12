@@ -14,7 +14,8 @@ y el asistente IA queda desactivado (para que nadie gaste tu saldo de Claude).
 1. Entra en <https://supabase.com>, crea una cuenta y pulsa **New project**.
    Ponle un nombre (ej. `impulsa`), una contraseña de base de datos (guárdala) y la región **South America (São Paulo)**.
 2. Cuando termine de crearse, ve a **SQL Editor → New query**, pega todo el contenido del archivo
-   [`supabase/schema.sql`](supabase/schema.sql) y pulsa **Run**. Debe decir "Success". (Se puede volver a
+   [`supabase/schema.sql`](supabase/schema.sql) y pulsa **Run**. Debe decir "Success". Crea las tablas de suscripciones, uso de IA, kit de marca y
+   **proyectos guardados** ("Mis proyectos"). (Se puede volver a
    ejecutar sin problema cuando el archivo se actualice: por ejemplo, para agregar la tabla del kit de marca.)
 3. **Mail de acceso.** Sin configurar nada, Supabase manda un mail con un **enlace** ("Sign in") y la web ya
    funciona con ese enlace. Si además quieres que llegue un **código de 6 dígitos**, primero configura un correo

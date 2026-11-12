@@ -333,6 +333,70 @@ export class Player {
     return c.toDataURL("image/jpeg", 0.7).split(",")[1];
   }
 
+  private snapVideos = new Map<string, HTMLVideoElement>();
+
+  private async snapVideo(assetId: string): Promise<HTMLVideoElement | null> {
+    let v = this.snapVideos.get(assetId);
+    if (!v) {
+      const asset = store.get().assets.find((a) => a.id === assetId);
+      if (!asset) return null;
+      v = document.createElement("video");
+      v.muted = true;
+      v.playsInline = true;
+      v.preload = "auto";
+      v.crossOrigin = "anonymous";
+      v.src = asset.url;
+      this.snapVideos.set(assetId, v);
+    }
+    if (v.readyState < 2) {
+      await new Promise<void>((res) => {
+        const done = () => res();
+        v!.addEventListener("loadeddata", done, { once: true });
+        setTimeout(done, 4000);
+      });
+    }
+    return v;
+  }
+
+  /**
+   * Renders the edited video (with texts, subtitles and effects) at the given timeline times,
+   * without touching playback. Used so the AI can "see" the whole video.
+   */
+  async renderFrames(times: number[], maxSide = 360): Promise<{ t: number; data: string }[]> {
+    const p = this.project;
+    const { w, h } = canvasSize(p.aspect);
+    const full = document.createElement("canvas");
+    full.width = w;
+    full.height = h;
+    const fctx = full.getContext("2d")!;
+    const s = Math.min(1, maxSide / Math.max(w, h));
+    const small = document.createElement("canvas");
+    small.width = Math.round(w * s);
+    small.height = Math.round(h * s);
+    const sctx = small.getContext("2d")!;
+    const out: { t: number; data: string }[] = [];
+    for (const t of times) {
+      const hit = clipAt(p, t);
+      let video: HTMLVideoElement | null = null;
+      if (hit) {
+        video = await this.snapVideo(hit.clip.assetId);
+        if (video) {
+          const target = hit.clip.in + (t - hit.start);
+          await new Promise<void>((res) => {
+            const done = () => res();
+            video!.addEventListener("seeked", done, { once: true });
+            video!.currentTime = Math.min(Math.max(0, target), Math.max(0, (video!.duration || target) - 0.05));
+            setTimeout(done, 2500);
+          });
+        }
+      }
+      drawFrame(fctx, { project: p, t, W: w, H: h, video, images: this.images });
+      sctx.drawImage(full, 0, 0, small.width, small.height);
+      out.push({ t, data: small.toDataURL("image/jpeg", 0.7).split(",")[1] });
+    }
+    return out;
+  }
+
   clipStarts() {
     return clipStarts(this.project);
   }

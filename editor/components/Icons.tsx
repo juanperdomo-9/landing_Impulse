@@ -138,3 +138,16 @@ export const IconBrandBars = ({ size = 16 }: { size?: number }) => (
     <path d="M18 19V6" stroke="#FFC93C" strokeWidth={3} />
   </svg>
 );
+
+export const IconTimeline = (p: IconProps) => (
+  <Svg {...p}>
+    <rect x="3" y="5" width="18" height="5" rx="1.5" />
+    <rect x="3" y="14" width="11" height="5" rx="1.5" />
+  </Svg>
+);
+
+export const IconShare = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5" />
+  </Svg>
+);

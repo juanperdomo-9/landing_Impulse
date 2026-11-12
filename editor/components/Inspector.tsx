@@ -5,6 +5,7 @@ import { splitClipAt } from "@/lib/project";
 import { store, useEditor } from "@/lib/store";
 import { EFFECT_LABELS, EFFECT_TYPES, type Animation, type EffectType, type Project, type TextPreset } from "@/lib/types";
 import { deleteSelection } from "@/lib/actions";
+import ColorField from "./ColorField";
 import Field from "./Field";
 
 /** Updates an item in place; consecutive edits of the same field are merged into one undo step. */
@@ -85,7 +86,55 @@ export default function Inspector() {
       update(`${o.id}${key}`, (p) => ({ ...p, overlays: p.overlays.map((x) => (x.id === o.id ? { ...x, ...patch } : x)) }));
     return (
       <div className="space-y-3">
-        {header(o.kind === "text" ? "Texto" : "Imagen")}
+        {header(o.kind === "text" ? "Texto" : "Foto")}
+        {o.kind === "image" && (
+          <div className="space-y-2">
+            <span className="label block">¿Cómo se ve la foto?</span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {(
+                [
+                  ["cover", "⬛", "Pantalla completa"],
+                  ["contain", "🖼", "Sin recortar"],
+                  ["free", "↔", "Libre"],
+                ] as const
+              ).map(([value, icon, label]) => {
+                const on = (o.fill ?? "free") === value;
+                return (
+                  <button
+                    key={value}
+                    onClick={() => set({ fill: value })}
+                    className={`flex flex-col items-center gap-1 rounded-xl border px-1 py-2.5 text-[11px] font-semibold ${on ? "border-[var(--accent)] bg-[var(--accent)]/20 text-white" : "border-[var(--line)] text-[var(--muted)]"}`}
+                  >
+                    <span className="text-lg">{icon}</span>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-[var(--muted)]">
+              {(o.fill ?? "free") === "cover"
+                ? "Llena toda la pantalla del formato elegido y recorta lo que sobra."
+                : o.fill === "contain"
+                  ? "Se ve la foto entera, con un fondo desenfocado donde sobra espacio."
+                  : "Tamaño y lugar libres: arrastrala en el video y usá «Tamaño». Ideal para logos."}
+            </p>
+            <button
+              className="text-xs font-semibold text-[var(--accent)] hover:underline"
+              onClick={() =>
+                store.edit((p) => ({
+                  ...p,
+                  overlays: p.overlays.map((x) =>
+                    x.kind === "image" && !(x.end - x.start >= 0.9 * Math.max(0.1, p.clips.reduce((a, c) => a + c.out - c.in, 0)) && x.size < 0.3)
+                      ? { ...x, fill: o.fill ?? "free" }
+                      : x,
+                  ),
+                }))
+              }
+            >
+              Aplicar a todas las fotos
+            </button>
+          </div>
+        )}
         {o.kind === "text" && (
           <>
             <Field label="Texto">
@@ -101,15 +150,17 @@ export default function Inspector() {
                 </select>
               </Field>
               <Field label="Color">
-                <input type="color" className="h-8 w-full" value={o.color ?? (o.preset === "etiqueta" || o.preset === "cta" ? "#ff3d71" : "#ffffff")} onChange={(e) => set({ color: e.target.value })} />
+                <ColorField id={`text-color-${o.id}`} value={o.color ?? (o.preset === "etiqueta" || o.preset === "cta" ? "#ff3d71" : "#ffffff")} onChange={(c) => set({ color: c })} />
               </Field>
             </div>
           </>
         )}
         {timeFields(o.start, o.end, (s, e) => set({ start: s, end: Math.max(s + 0.1, e) }, "time"))}
-        <Field label={`Tamaño ${o.size.toFixed(2)}`}>
-          <input type="range" min={o.kind === "image" ? 0.05 : 0.3} max={o.kind === "image" ? 1 : 3} step={0.01} value={o.size} className="w-full" onChange={(e) => set({ size: Number(e.target.value) })} />
-        </Field>
+        {(o.kind === "text" || !o.fill || o.fill === "free") && (
+          <Field label={`Tamaño ${o.size.toFixed(2)}`}>
+            <input type="range" min={o.kind === "image" ? 0.05 : 0.3} max={o.kind === "image" ? 1 : 3} step={0.01} value={o.size} className="w-full" onChange={(e) => set({ size: Number(e.target.value) })} />
+          </Field>
+        )}
         <Field label="Animación">
           <select className="input" value={o.animation} onChange={(e) => set({ animation: e.target.value as Animation })}>
             <option value="none">Ninguna</option>

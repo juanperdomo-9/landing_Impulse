@@ -56,3 +56,19 @@ alter table public.brand_kits enable row level security;
 drop policy if exists "ver mi marca" on public.brand_kits;
 create policy "ver mi marca" on public.brand_kits
   for select using (auth.uid() = user_id);
+
+-- Proyectos guardados (las ediciones; los videos quedan en el dispositivo de cada usuario)
+create table if not exists public.projects (
+  id uuid primary key,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null default 'Proyecto sin título',
+  data jsonb not null,
+  thumb text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists projects_user_idx on public.projects (user_id, updated_at desc);
+alter table public.projects enable row level security;
+drop policy if exists "ver mis proyectos" on public.projects;
+create policy "ver mis proyectos" on public.projects
+  for select using (auth.uid() = user_id);

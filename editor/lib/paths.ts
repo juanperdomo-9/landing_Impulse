@@ -13,7 +13,8 @@ export const BASE_PATH = "/editor";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://impulsastudiodigital.com.ar").replace(/\/+$/, "");
 
 /** An app path ("/api/copy") as the browser must request it ("/editor/api/copy"). */
-export const withBase = (path: string) => `${BASE_PATH}${path}`;
+export const withBase = (path: string) =>
+  path === "/" || path.startsWith("/?") ? `${BASE_PATH}${path.slice(1)}` : `${BASE_PATH}${path}`; // "/?p=1" -> "/editor?p=1"
 
 /**
  * Absolute public URL of an app path. Route handlers use it instead of req.url, because behind

@@ -12,6 +12,18 @@ export interface Asset {
 }
 
 /** A piece of a source video placed on the main track. Clips play one after another. */
+/** What is stored about a file in a saved project (the file itself stays on the device). */
+export interface AssetMeta {
+  id: string;
+  kind: AssetKind;
+  name: string;
+  duration: number;
+  width?: number;
+  height?: number;
+  size: number;
+  type: string;
+}
+
 export interface Clip {
   id: string;
   assetId: string;
@@ -46,6 +58,11 @@ export interface Overlay {
   y: number;
   /** image: width as fraction of canvas width; text: font size multiplier */
   size: number;
+  /**
+   * images only: "cover" fills the whole frame (crops), "contain" shows the whole photo over a blurred
+   * copy of itself, "free" uses x / y / size (logos, small pictures). Missing = "free".
+   */
+  fill?: "cover" | "contain" | "free";
   animation: Animation;
 }
 
@@ -96,6 +113,8 @@ export interface SubtitleStyle {
   uppercase: boolean;
   background: boolean;
   wordsPerCue: number;
+  /** which audio the subtitles come from: the voice of the clips, the background song, or both */
+  source?: "video" | "music" | "all";
 }
 
 export const EFFECT_TYPES = [

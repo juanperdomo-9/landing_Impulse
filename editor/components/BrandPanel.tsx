@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { applyBrand, BRAND_FONTS, emptyBrand, loadFont, logoToDataUrl, saveBrand } from "@/lib/brand";
 import { store, useEditor } from "@/lib/store";
 import type { BrandKit } from "@/lib/types";
+import ColorField from "./ColorField";
 import Field from "./Field";
 
 export default function BrandPanel() {
@@ -119,15 +120,15 @@ export default function BrandPanel() {
         </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-3">
         <Field label="Principal">
-          <input id="brand-primary" type="color" className="h-8 w-full" value={b.primary} onChange={(e) => set({ primary: e.target.value })} />
+          <ColorField id="brand-primary" value={b.primary} onChange={(c) => set({ primary: c })} />
         </Field>
         <Field label="Secundario">
-          <input id="brand-secondary" type="color" className="h-8 w-full" value={b.secondary} onChange={(e) => set({ secondary: e.target.value })} />
+          <ColorField id="brand-secondary" value={b.secondary} onChange={(c) => set({ secondary: c })} />
         </Field>
         <Field label="Texto">
-          <input id="brand-text" type="color" className="h-8 w-full" value={b.text} onChange={(e) => set({ text: e.target.value })} />
+          <ColorField id="brand-text" value={b.text} onChange={(c) => set({ text: c })} />
         </Field>
       </div>
 

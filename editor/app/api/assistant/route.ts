@@ -13,7 +13,7 @@ const MODEL = process.env.CLAUDE_MODEL || "claude-haiku-5-5";
 const MAX_BODY_CHARS = 8_000_000; // ~6 MB of images at most once base64-encoded
 const MAX_MESSAGES = 240; // 8 instructions x up to 25 messages each, as the browser keeps them
 const MAX_TEXT_CHARS = 300_000; // all text in the conversation (~75k tokens)
-const MAX_IMAGES = 16; // the browser keeps the images of the last 2 instructions (frame + up to 6 photos each)
+const MAX_IMAGES = 60; // the browser sends at most 50 (storyboard, new photos and frames the AI asked to see)
 const MAX_TOOL_RESULT_CHARS = 120_000; // a long transcript fits; a smuggled novel does not
 
 let client: Anthropic | null = null;
@@ -34,8 +34,14 @@ function textChars(blocks: Block[]): number {
   return n;
 }
 
+/** Images in a list of blocks, including the frames inside tool results. */
 function imageCount(blocks: Block[]): number {
-  return blocks.filter((b) => b.type === "image").length;
+  let n = 0;
+  for (const b of blocks) {
+    if (b.type === "image") n++;
+    else if (b.type === "tool_result" && Array.isArray(b.content)) n += b.content.filter((c) => c.type === "image").length;
+  }
+  return n;
 }
 
 /** Checks the shape and size of the conversation. Returns an error message, or null when it is fine. */
@@ -102,9 +108,9 @@ export async function POST(req: Request) {
   try {
     const stream = client.beta.messages.stream({
       model: MODEL,
-      // the AI answers with short texts and small tool calls; this caps the cost of a single request
-      max_tokens: 12000,
-      output_config: { effort: "medium" },
+      max_tokens: 32000,
+      // a bit more thinking gives noticeably better editing judgment at a small extra cost
+      output_config: { effort: "high" },
       system: SYSTEM_PROMPT,
       // eager streaming: inputs are small but arrive sooner; the browser validates them
       tools: AI_TOOLS.map((t) => ({ ...t, eager_input_streaming: true })),

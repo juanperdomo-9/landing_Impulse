@@ -121,9 +121,15 @@ export default async function CuentaPage({
                 cuando quieras desde el botón de baja, acá abajo.
               </p>
             )}
-            <Link href="/" className="btn btn-primary w-full justify-center !py-2.5">
-              Abrir el editor
-            </Link>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              {/* plain links (full page load) so the editor starts empty */}
+              <a href={withBase("/")} className="btn btn-primary flex-1 justify-center !py-2.5">
+                + Nuevo proyecto
+              </a>
+              <a href={withBase("/proyectos")} className="btn flex-1 justify-center !py-2.5">
+                Mis proyectos
+              </a>
+            </div>
           </div>
         ) : (
           <div className="mt-5 space-y-3">

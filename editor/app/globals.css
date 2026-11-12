@@ -85,6 +85,7 @@ h3 {
     background 0.2s,
     border-color 0.2s,
     opacity 0.2s;
+  white-space: nowrap;
 }
 .btn:hover:not(:disabled) {
   border-color: var(--sun);
@@ -156,4 +157,52 @@ input[type="range"] {
   .brand-chip {
     transition: none;
   }
+}
+
+/* phones: 16px inputs so iOS doesn't zoom in when typing; bigger touch targets */
+@media (max-width: 767px) {
+  .input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+  .btn {
+    min-height: 38px;
+  }
+}
+
+/* seek bar under the video: thick and easy to drag with a finger */
+input[type="range"].seek {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+input[type="range"].seek::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--panel-2);
+}
+input[type="range"].seek::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--panel-2);
+}
+input[type="range"].seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -7px;
+  height: 20px;
+  width: 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  border: 2px solid white;
+}
+input[type="range"].seek::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 999px;
+  background: var(--accent);
+  border: 2px solid white;
 }

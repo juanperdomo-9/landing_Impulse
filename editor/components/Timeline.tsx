@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getPlayer } from "@/lib/player";
 import { clipDur, clipStarts, contentDuration } from "@/lib/project";
 import { store, useEditor } from "@/lib/store";
@@ -8,7 +8,8 @@ import type { Project, Selection } from "@/lib/types";
 import { EFFECT_LABELS } from "@/lib/types";
 
 type Kind = NonNullable<Selection>["kind"];
-const LABEL_W = 92;
+const LABEL_W_DESKTOP = 92;
+const LABEL_W_MOBILE = 64;
 
 interface Item {
   id: string;
@@ -19,13 +20,25 @@ interface Item {
   color: string;
 }
 
-export default function Timeline() {
+export default function Timeline({ mobile = false }: { mobile?: boolean }) {
+  const LABEL_W = mobile ? LABEL_W_MOBILE : LABEL_W_DESKTOP;
   const project = useEditor((s) => s.project);
   const assets = useEditor((s) => s.assets);
   const time = useEditor((s) => s.time);
   const selection = useEditor((s) => s.selection);
-  const [pps, setPps] = useState(40); // pixels per second
+  const [pps, setPps] = useState(mobile ? 24 : 40); // pixels per second
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // follow the playhead (while playing or dragging) so it never leaves the screen
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const x = LABEL_W + time * pps;
+    const left = el.scrollLeft + LABEL_W + 16;
+    const right = el.scrollLeft + el.clientWidth - 24;
+    if (x < left) el.scrollLeft = Math.max(0, x - LABEL_W - 40);
+    else if (x > right) el.scrollLeft = x - el.clientWidth + 80;
+  }, [time, pps, LABEL_W]);
 
   const duration = Math.max(contentDuration(project), 10);
   const width = duration * pps + 200;
@@ -45,18 +58,33 @@ export default function Timeline() {
       })),
     },
     {
-      title: "Textos/Fotos",
-      items: project.overlays.map((o) => ({
-        id: o.id,
-        kind: "overlay",
-        start: o.start,
-        end: o.end,
-        label: o.kind === "text" ? `T  ${o.text}` : `🖼 ${name(o.assetId)}`,
-        color: o.kind === "text" ? "#b4367a" : "#a1531f",
-      })),
+      title: "Fotos",
+      items: project.overlays
+        .filter((o) => o.kind === "image")
+        .map((o) => ({
+          id: o.id,
+          kind: "overlay" as const,
+          start: o.start,
+          end: o.end,
+          label: `🖼 ${name(o.assetId)}`,
+          color: "#a1531f",
+        })),
     },
     {
-      title: "Subtítulos",
+      title: "Textos",
+      items: project.overlays
+        .filter((o) => o.kind === "text")
+        .map((o) => ({
+          id: o.id,
+          kind: "overlay" as const,
+          start: o.start,
+          end: o.end,
+          label: `T  ${o.text}`,
+          color: "#b4367a",
+        })),
+    },
+    {
+      title: mobile ? "Subs" : "Subtítulos",
       items: project.cues.map((c) => ({
         id: c.id,
         kind: "cue",
@@ -108,10 +136,17 @@ export default function Timeline() {
     window.addEventListener("pointerup", up);
   };
 
+  // on touch screens rows scroll natively; a tap moves the playhead
+  const rowDown = (e: React.PointerEvent) => {
+    if (e.pointerType === "touch") return;
+    scrub(e);
+  };
+
   const startDrag = (e: React.PointerEvent, it: Item, mode: "move" | "resize") => {
     e.stopPropagation();
     store.set({ selection: { kind: it.kind, id: it.id } });
-    if (it.kind === "clip") return;
+    // with a finger, tapping selects (times are edited in "Editar"); dragging would fight scrolling
+    if (it.kind === "clip" || e.pointerType === "touch") return;
     const before = store.get().project;
     const x0 = e.clientX;
     const move = (ev: PointerEvent) => {
@@ -133,7 +168,7 @@ export default function Timeline() {
   for (let t = 0; t <= duration + 4; t += step) ticks.push(t);
 
   return (
-    <div className="flex h-[19rem] shrink-0 flex-col border-t border-[var(--line)] bg-[var(--panel)]">
+    <div className={`flex shrink-0 flex-col bg-[var(--panel)] ${mobile ? "h-full" : "h-[19rem] border-t border-[var(--line)]"}`}>
       <div className="flex h-9 shrink-0 items-center gap-2 border-b border-[var(--line)] px-3 text-xs">
         <span className="label">Línea de tiempo</span>
         <div className="flex-1" />
@@ -142,9 +177,9 @@ export default function Timeline() {
       </div>
       <div ref={scrollRef} className="scroll-thin relative min-h-0 flex-1 overflow-auto">
         <div style={{ width: width + LABEL_W }} className="relative min-h-full">
-          <div className="sticky top-0 z-20 flex h-6 bg-[var(--panel)]">
+          <div className={`sticky top-0 z-20 flex bg-[var(--panel)] ${mobile ? "h-9" : "h-6"}`}>
             <div style={{ width: LABEL_W }} className="sticky left-0 z-10 shrink-0 bg-[var(--panel)]" />
-            <div className="relative flex-1 cursor-ew-resize border-b border-[var(--line)]" onPointerDown={scrub}>
+            <div className="relative flex-1 cursor-ew-resize border-b border-[var(--line)]" style={{ touchAction: "none" }} onPointerDown={scrub}>
               {ticks.map((t) => (
                 <div key={t} className="absolute top-0 h-full border-l border-[var(--line)] pl-1 text-[10px] text-[var(--muted)]" style={{ left: t * pps }}>
                   {Math.floor(t / 60)}:{String(t % 60).padStart(2, "0")}
@@ -160,7 +195,11 @@ export default function Timeline() {
               >
                 {row.title}
               </div>
-              <div className="relative flex-1" onPointerDown={scrub}>
+              <div
+                className="relative flex-1"
+                onPointerDown={rowDown}
+                onClick={(e) => mobile && getPlayer()?.seek(tFromEvent(e))}
+              >
                 {row.items.map((it) => {
                   const sel = selection?.id === it.id;
                   return (
@@ -185,7 +224,18 @@ export default function Timeline() {
             </div>
           ))}
           <div className="pointer-events-none absolute top-0 bottom-0 z-30 w-px bg-[#ff4d6d]" style={{ left: LABEL_W + time * pps }}>
-            <div className="absolute -top-0 -left-1.5 h-3 w-3 rotate-45 bg-[#ff4d6d]" />
+            {/* big grab handle: drag the playhead back and forth */}
+            <div
+              className="pointer-events-auto absolute -top-0.5 -left-4 grid h-8 w-8 cursor-ew-resize place-items-start justify-center"
+              style={{ touchAction: "none" }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                scrub(e);
+              }}
+              title="Arrastrá para moverte por el video"
+            >
+              <div className={`rotate-45 rounded-sm bg-[#ff4d6d] shadow ${mobile ? "mt-1 h-4 w-4" : "mt-0.5 h-3 w-3"}`} />
+            </div>
           </div>
         </div>
       </div>
